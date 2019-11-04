@@ -66,12 +66,15 @@ void Player::OnMouseMove(int x, int y)
 {
 	yaw += x;
 	pitch += y;
-	yaw = glm::radians(yaw);
-	pitch = glm::radians(pitch);
+	
 	if (pitch > 89)
 		pitch = 89.0f;
 	if (pitch < -89)
 		pitch = -89.0f;
+	yaw = glm::radians(yaw);
+	pitch = glm::radians(pitch);
 	rotation = glm::vec3(-sin(yaw)*cos(pitch), -sin(pitch), cos(pitch) * cos(yaw));
+	//glm::vec4 t = glm::vec4(0.0f, 0.0f, -1.0f, 0.0f) * glm::rotate(pitch, glm::vec3(1.0f,0.0f,0.0f)) * glm::rotate(yaw, glm::vec3(0.0f, 1.0f, 0.0f));
+	//rotation = glm::vec3(t);
 }
 

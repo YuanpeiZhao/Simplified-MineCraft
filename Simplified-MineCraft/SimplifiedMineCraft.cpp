@@ -165,6 +165,8 @@ void initOpenGl()
 		//double check that you are using glUniform1f
 		glUniform1i(grass_side_tex_loc, 2);
 	}
+
+	SetCursorPos(mouseX, mouseY);
 }
 
 // glut callbacks need to send keyboard and mouse events to imgui
@@ -176,7 +178,7 @@ void keyboard(unsigned char key, int x, int y)
 void motion(int x, int y)
 {	
 	player.OnMouseMove(x - mouseX, y - mouseY);
-	//SetCursorPos(mouseX, mouseY);
+	
 }
 
 
