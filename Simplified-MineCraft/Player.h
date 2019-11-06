@@ -12,6 +12,7 @@ public:
 	~Player();
 
 	float step;
+	float mouseSensitivity;
 	float yaw;
 	float pitch;
 	glm::vec3 position;

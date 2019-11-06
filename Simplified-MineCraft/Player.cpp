@@ -8,7 +8,8 @@ Player::Player(glm::vec3 pos, glm::vec3 rot)
 	rotation = glm::normalize(rot);
 	pitch = 0;
 	yaw = 0;
-	step = 0.1f;
+	step = 0.05f;
+	mouseSensitivity = 1.0f;
 }
 
 
@@ -62,19 +63,23 @@ void Player::GetKey(unsigned char key)
 
 }
 
+
+
 void Player::OnMouseMove(int x, int y)
 {
+	x = x * mouseSensitivity;
+	y = y * mouseSensitivity;
 	yaw += x;
 	pitch += y;
 	
-	if (pitch > 89)
+	if (pitch > 89.0f)
 		pitch = 89.0f;
-	if (pitch < -89)
+	if (pitch < -89.0f)
 		pitch = -89.0f;
-	yaw = glm::radians(yaw);
-	pitch = glm::radians(pitch);
-	rotation = glm::vec3(-sin(yaw)*cos(pitch), -sin(pitch), cos(pitch) * cos(yaw));
-	//glm::vec4 t = glm::vec4(0.0f, 0.0f, -1.0f, 0.0f) * glm::rotate(pitch, glm::vec3(1.0f,0.0f,0.0f)) * glm::rotate(yaw, glm::vec3(0.0f, 1.0f, 0.0f));
-	//rotation = glm::vec3(t);
+	/*float Y = glm::radians(yaw);
+	float P = glm::radians(pitch);
+	rotation = glm::vec3(-sin(Y)*cos(P), sin(P), -cos(P) * cos(Y));*/
+	glm::vec4 t =  glm::rotate(yaw, glm::vec3(0.0f, 1.0f, 0.0f))* glm::rotate( pitch, glm::vec3(1.0f,0.0f,0.0f)) * glm::vec4(0.0f, 0.0f, -1.0f, 0.0f)  ;
+	rotation = glm::vec3(t);
 }
 

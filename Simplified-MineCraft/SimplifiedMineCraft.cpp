@@ -38,8 +38,10 @@ float camangle = 0.0f;
 glm::vec3 campos(3.0f, 3.0f, 3.0f);
 float aspect = 1.0f;
 
+int deltaTime = 16;
 float mouseX = 320.0f, mouseY = 320.0f;
-Player player(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, -1.0f));
+float verAxis = 0.0f, horAxis = 0.0f;
+Player player(glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(0.0f, 0.0f, -1.0f));
 
 void draw_gui()
 {
@@ -116,6 +118,16 @@ void idle()
 	}
 }
 
+void Timer(int value) {
+	glm::vec3 dir = player.Forward() * verAxis + player.Right() * horAxis;
+	
+	
+	player.Move(dir, player.step);
+
+
+	glutPostRedisplay();
+	glutTimerFunc(deltaTime, Timer, 1);
+}
 void printGlInfo()
 {
 	std::cout << "Vendor: " << glGetString(GL_VENDOR) << std::endl;
@@ -166,18 +178,57 @@ void initOpenGl()
 		glUniform1i(grass_side_tex_loc, 2);
 	}
 
+	
 	SetCursorPos(mouseX, mouseY);
 }
 
 // glut callbacks need to send keyboard and mouse events to imgui
 void keyboard(unsigned char key, int x, int y)
 {	
-	player.GetKey(key);
+	switch (key)
+	{
+	case 'w':
+		verAxis = 1.0f;
+		break;
+	case 's':
+		verAxis = -1.0f;
+		break;
+	case 'a':
+		horAxis = -1.0f;
+		break;
+	case 'd':
+		horAxis = 1.0f;
+		break;
+	default:
+		break;
+	}
+}
+
+void keyboard_up(unsigned char key, int x, int y) {
+	switch (key)
+	{
+	case 'w':
+		verAxis = 0.0f;
+		break;
+	case 's':
+		verAxis = 0.0f;
+		break;
+	case 'a':
+		horAxis = 0.0f;
+		break;
+	case 'd':
+		horAxis = 0.0f;
+		break;
+	default:
+		break;
+	}
 }
 
 void motion(int x, int y)
 {	
-	player.OnMouseMove(x - mouseX, y - mouseY);
+	player.OnMouseMove(mouseX - x, mouseY - y);
+	mouseX = x;
+	mouseY = y;
 	
 }
 
@@ -202,8 +253,12 @@ int main(int argc, char** argv)
 
 	//Register callback functions with glut. 
 	glutDisplayFunc(display);
+	
+	glutTimerFunc(deltaTime, Timer, 1);	
 	glutKeyboardFunc(keyboard);
+	glutKeyboardUpFunc(keyboard_up);
 	glutPassiveMotionFunc(motion);
+
 	glutIdleFunc(idle);
 	glutReshapeFunc(reshape);
 
