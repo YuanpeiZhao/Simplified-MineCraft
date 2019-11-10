@@ -17,6 +17,7 @@
 
 #include "GenCubes.h"
 #include "Player.h"
+#include "GameManager.h"
 
 
 //Texture files and IDs
@@ -38,10 +39,10 @@ float camangle = 0.0f;
 glm::vec3 campos(3.0f, 3.0f, 3.0f);
 float aspect = 1.0f;
 
-int deltaTime = 16;
+
 float mouseX = 320.0f, mouseY = 320.0f;
 float verAxis = 0.0f, horAxis = 0.0f;
-Player player(glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(0.0f, 0.0f, -1.0f));
+Player player(glm::vec3(0.0f, 15.0f, 0.0f), glm::vec3(0.0f, 0.0f, -1.0f));
 
 void draw_gui()
 {
@@ -59,7 +60,7 @@ void draw_gui()
 void draw_cubes(const glm::mat4& P, const glm::mat4& V)
 {
 	glUseProgram(cube_shader_program);
-	glm::mat4 R = glm::rotate(-90.0f, glm::vec3(1.0f, 0.0f, 0.0f));
+	glm::mat4 R = glm::rotate(0.0f, glm::vec3(1.0f, 0.0f, 0.0f));
 	glm::mat4 M = R * glm::scale(glm::vec3(1.0f));
 
 	int M_loc = glGetUniformLocation(cube_shader_program, "M");
@@ -118,16 +119,21 @@ void idle()
 	}
 }
 
-void Timer(int value) {
-	glm::vec3 dir = player.Forward() * verAxis + player.Right() * horAxis;
+void Timer(int value) {	
+	
+		glm::vec3 dir = player.Forward() * verAxis * player.step + player.Right() * horAxis * player.step;
+		player.velocity.x = dir.x;
+		player.velocity.z = dir.z;
 	
 	
-	player.Move(dir, player.step);
+
+	player.Update();
 
 
 	glutPostRedisplay();
 	glutTimerFunc(deltaTime, Timer, 1);
 }
+
 void printGlInfo()
 {
 	std::cout << "Vendor: " << glGetString(GL_VENDOR) << std::endl;
@@ -198,6 +204,9 @@ void keyboard(unsigned char key, int x, int y)
 		break;
 	case 'd':
 		horAxis = 1.0f;
+		break;
+	case 32:
+		player.Jump();
 		break;
 	default:
 		break;

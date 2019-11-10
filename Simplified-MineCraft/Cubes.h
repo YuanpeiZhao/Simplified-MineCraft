@@ -14,12 +14,9 @@ public:
 	int type;
 
 	Cube(int type, vec3 position);
-
+	
 };
 
-Cube::Cube(int t, vec3 pos) {
-	type = t;
-	position = pos;
-}
+
 
 #endif

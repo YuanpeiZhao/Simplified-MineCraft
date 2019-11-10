@@ -4,6 +4,10 @@
 #include <windows.h>
 #include <GL/glew.h>
 
+#include "GameManager.h"
+
+
+
 GLuint create_cube_vao();
 void draw_cubes(GLuint vao);
 void init_map();

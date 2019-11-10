@@ -1,14 +1,13 @@
-#include <vector>
+
 
 #include <glm/glm.hpp>
 #include <glm/gtc/constants.hpp> //for pi
-
 #include "GenCubes.h"
-#include "Cubes.h"
+
+
 
 static int N = 50;
 
-std::vector<Cube> cubeList;
 
 float basic[] = {
 	// positions          // normals           // texture coords
@@ -57,7 +56,13 @@ float basic[] = {
 
 void init_map()
 {
+	
 	cubeList.push_back(Cube(GRASS_CUBE, glm::vec3(0.0f, 0.0f, 0.0f)));
+	cubeList.push_back(Cube(GRASS_CUBE, glm::vec3(4.0f, 0.0f, 0.0f)));
+	cubeList.push_back(Cube(GRASS_CUBE, glm::vec3(6.0f, 0.0f, 0.0f)));
+	cubeList.push_back(Cube(GRASS_CUBE, glm::vec3(0.0f, 0.0f, 4.0f)));
+	cubeList.push_back(Cube(GRASS_CUBE, glm::vec3(0.0f, 3.0f, 6.0f)));
+
 	cubeList.push_back(Cube(GRASS_CUBE, glm::vec3(0.0f, 1.0f, 0.0f)));
 	cubeList.push_back(Cube(GRASS_CUBE, glm::vec3(0.0f, -1.0f, 0.0f)));
 	cubeList.push_back(Cube(GRASS_CUBE, glm::vec3(1.0f, 0.0f, 0.0f)));
