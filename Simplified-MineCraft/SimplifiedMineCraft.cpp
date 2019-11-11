@@ -29,6 +29,16 @@ GLuint grass_cube_top_texture_id = -1;
 static const std::string grass_cube_side_texture_name = "textures/grassBlock/grass_block_side.png";
 GLuint grass_cube_side_texture_id = -1;
 
+static const std::string tree_log_texture_name = "textures/treeBlock/oak_log.png";
+GLuint tree_log_texture_id = -1;
+static const std::string tree_log_top_texture_name = "textures/treeBlock/oak_log_top.png";
+GLuint tree_log_top_texture_id = -1;
+static const std::string tree_leaves_texture_name = "textures/treeBlock/oak_leaves.png";
+GLuint tree_leaves_texture_id = -1;
+
+static const std::string water_still_texture_name = "textures/waterBlock/water_still.png";
+GLuint water_still_texture_id = -1;
+
 static const std::string skybox_name[15] = { "cubemap\\01", "cubemap\\02", "cubemap\\03", "cubemap\\04", "cubemap\\05", "cubemap\\06", "cubemap\\07", "cubemap\\08", 
 "cubemap\\09", "cubemap\\10", "cubemap\\11",  "cubemap\\12",  "cubemap\\13",  "cubemap\\14",  "cubemap\\15", };
 GLuint skybox_id[15] = { -1 }; //Texture id for cubemap
@@ -212,6 +222,7 @@ void draw_cubes(const glm::mat4& P, const glm::mat4& V)
 		glUniformMatrix4fv(PVM_loc, 1, false, glm::value_ptr(PVM));
 	}
 
+	// grassCube Textures
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, dirt_texture_id);
 	glActiveTexture(GL_TEXTURE1);
@@ -220,22 +231,59 @@ void draw_cubes(const glm::mat4& P, const glm::mat4& V)
 	glBindTexture(GL_TEXTURE_2D, grass_cube_side_texture_id);
 
 	glUseProgram(cube_shader_program);
-	int dirt_tex_loc = glGetUniformLocation(cube_shader_program, "Texture0");
+	int dirt_tex_loc = glGetUniformLocation(cube_shader_program, "dirt_tex");
 	if (dirt_tex_loc != -1)
 	{
 		glUniform1i(dirt_tex_loc, 0);
 	}
 
-	int grass_top_tex_loc = glGetUniformLocation(cube_shader_program, "Texture1");
+	int grass_top_tex_loc = glGetUniformLocation(cube_shader_program, "grass_top_tex");
 	if (grass_top_tex_loc != -1)
 	{
 		glUniform1i(grass_top_tex_loc, 1);
 	}
 
-	int grass_side_tex_loc = glGetUniformLocation(cube_shader_program, "Texture2");
+	int grass_side_tex_loc = glGetUniformLocation(cube_shader_program, "grass_side_tex");
 	if (grass_side_tex_loc != -1)
 	{
 		glUniform1i(grass_side_tex_loc, 2);
+	}
+
+	// treeCube Textures
+	glActiveTexture(GL_TEXTURE3);
+	glBindTexture(GL_TEXTURE_2D, tree_log_texture_id);
+	glActiveTexture(GL_TEXTURE4);
+	glBindTexture(GL_TEXTURE_2D, tree_log_top_texture_id);
+	glActiveTexture(GL_TEXTURE5);
+	glBindTexture(GL_TEXTURE_2D, tree_leaves_texture_id);
+
+	glUseProgram(cube_shader_program);
+	int tree_log_tex_loc = glGetUniformLocation(cube_shader_program, "tree_log_tex");
+	if (tree_log_tex_loc != -1)
+	{
+		glUniform1i(tree_log_tex_loc, 3);
+	}
+
+	int tree_log_top_tex_loc = glGetUniformLocation(cube_shader_program, "tree_log_top_tex");
+	if (tree_log_top_tex_loc != -1)
+	{
+		glUniform1i(tree_log_top_tex_loc, 4);
+	}
+
+	int tree_leaves_tex_loc = glGetUniformLocation(cube_shader_program, "tree_leaves_tex");
+	if (tree_leaves_tex_loc != -1)
+	{
+		glUniform1i(tree_leaves_tex_loc, 5);
+	}
+
+	glActiveTexture(GL_TEXTURE6);
+	glBindTexture(GL_TEXTURE_2D, water_still_texture_id);
+
+	glUseProgram(cube_shader_program);
+	int water_still_tex_loc = glGetUniformLocation(cube_shader_program, "water_still_tex");
+	if (water_still_tex_loc != -1)
+	{
+		glUniform1i(water_still_tex_loc, 6);
 	}
 
 	glBindVertexArray(cube_vao);
@@ -252,7 +300,7 @@ void display()
 	glm::mat4 V = glm::lookAt(player.position, player.Target(), glm::vec3(0.0f, 1.0f, 0.0f));
 	glm::mat4 P = glm::perspective(80.0f, aspect, 0.1f, 100.0f); //not affine
 
-	draw_skybox(P, V);
+	//draw_skybox(P, V);
 	draw_cubes(P, V);
 
 	draw_gui();
@@ -314,7 +362,7 @@ void initOpenGl()
 
 	for (int i = 0; i < 15; i++)
 	{
-		skybox_id[i] = LoadCube(skybox_name[i]);
+		//skybox_id[i] = LoadCube(skybox_name[i]);
 	}
 	
 	skybox_shader_program = InitShader(skybox_vs.c_str(), skybox_fs.c_str());
@@ -330,6 +378,12 @@ void initOpenGl()
 	dirt_texture_id = LoadTexture(dirt_texture_name);
 	grass_cube_top_texture_id = LoadTexture(grass_cube_top_texture_name);
 	grass_cube_side_texture_id = LoadTexture(grass_cube_side_texture_name);
+
+	tree_log_texture_id = LoadTexture(tree_log_texture_name);
+	tree_log_top_texture_id = LoadTexture(tree_log_top_texture_name);
+	tree_leaves_texture_id = LoadTexture(tree_leaves_texture_name);
+
+	water_still_texture_id = LoadTexture(water_still_texture_name);
 	
 	SetCursorPos(mouseX, mouseY);
 }
