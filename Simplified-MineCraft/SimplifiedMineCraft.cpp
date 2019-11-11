@@ -15,6 +15,7 @@
 #include "LoadTexture.h"
 #include "imgui_impl_glut.h"
 
+#include "Skybox.h"
 #include "GenCubes.h"
 #include "Player.h"
 #include "GameManager.h"
@@ -28,11 +29,21 @@ GLuint grass_cube_top_texture_id = -1;
 static const std::string grass_cube_side_texture_name = "textures/grassBlock/grass_block_side.png";
 GLuint grass_cube_side_texture_id = -1;
 
+static const std::string skybox_name[15] = { "cubemap\\01", "cubemap\\02", "cubemap\\03", "cubemap\\04", "cubemap\\05", "cubemap\\06", "cubemap\\07", "cubemap\\08", 
+"cubemap\\09", "cubemap\\10", "cubemap\\11",  "cubemap\\12",  "cubemap\\13",  "cubemap\\14",  "cubemap\\15", };
+GLuint skybox_id[15] = { -1 }; //Texture id for cubemap
+
 //Cube files and IDs
 static const std::string cube_vs("cube_vs.glsl");
 static const std::string cube_fs("cube_fs.glsl");
 GLuint cube_shader_program = -1;
 GLuint cube_vao = -1;
+
+//Skybox files and IDs
+static const std::string skybox_vs("skybox_vs.glsl");
+static const std::string skybox_fs("skybox_fs.glsl");
+GLuint skybox_shader_program = -1;
+GLuint skybox_vao = -1;
 
 //camera and viewport
 float camangle = 0.0f;
@@ -55,6 +66,131 @@ void draw_gui()
 	ImGui::End();
 
 	ImGui::Render();
+}
+
+void draw_skybox(const glm::mat4& P, const glm::mat4& V)
+{
+	glUseProgram(skybox_shader_program);
+	int PVM_loc = glGetUniformLocation(skybox_shader_program, "PVM");
+	if (PVM_loc != -1)
+	{
+		glm::mat4 Msky = glm::scale(glm::vec3(5.0f));
+		glm::mat4 PVM = P * V * Msky;
+		PVM[3] = glm::vec4(0.0f, 0.0f, 0.0f, 1.0f);
+		glUniformMatrix4fv(PVM_loc, 1, false, glm::value_ptr(PVM));
+	}
+
+	glActiveTexture(GL_TEXTURE1);
+	glBindTexture(GL_TEXTURE_CUBE_MAP, skybox_id[0]);
+	glActiveTexture(GL_TEXTURE2);
+	glBindTexture(GL_TEXTURE_CUBE_MAP, skybox_id[1]);
+	glActiveTexture(GL_TEXTURE3);
+	glBindTexture(GL_TEXTURE_CUBE_MAP, skybox_id[2]);
+	glActiveTexture(GL_TEXTURE4);
+	glBindTexture(GL_TEXTURE_CUBE_MAP, skybox_id[3]);
+	glActiveTexture(GL_TEXTURE5);
+	glBindTexture(GL_TEXTURE_CUBE_MAP, skybox_id[4]);
+	glActiveTexture(GL_TEXTURE6);
+	glBindTexture(GL_TEXTURE_CUBE_MAP, skybox_id[5]);
+	glActiveTexture(GL_TEXTURE7);
+	glBindTexture(GL_TEXTURE_CUBE_MAP, skybox_id[6]);
+	glActiveTexture(GL_TEXTURE8);
+	glBindTexture(GL_TEXTURE_CUBE_MAP, skybox_id[7]);
+	glActiveTexture(GL_TEXTURE9);
+	glBindTexture(GL_TEXTURE_CUBE_MAP, skybox_id[8]);
+	glActiveTexture(GL_TEXTURE10);
+	glBindTexture(GL_TEXTURE_CUBE_MAP, skybox_id[9]);
+	glActiveTexture(GL_TEXTURE11);
+	glBindTexture(GL_TEXTURE_CUBE_MAP, skybox_id[10]);
+	glActiveTexture(GL_TEXTURE12);
+	glBindTexture(GL_TEXTURE_CUBE_MAP, skybox_id[11]);
+	glActiveTexture(GL_TEXTURE13);
+	glBindTexture(GL_TEXTURE_CUBE_MAP, skybox_id[12]);
+	glActiveTexture(GL_TEXTURE14);
+	glBindTexture(GL_TEXTURE_CUBE_MAP, skybox_id[13]);
+	glActiveTexture(GL_TEXTURE15);
+	glBindTexture(GL_TEXTURE_CUBE_MAP, skybox_id[14]);
+
+	int skybox01_loc = glGetUniformLocation(skybox_shader_program, "cubemap01");
+	if (skybox01_loc != -1)
+	{
+		glUniform1i(skybox01_loc, 1); // we bound our texture to texture unit 1
+	}
+	int skybox02_loc = glGetUniformLocation(skybox_shader_program, "cubemap02");
+	if (skybox02_loc != -1)
+	{
+		glUniform1i(skybox02_loc, 2); // we bound our texture to texture unit 1
+	}
+	int skybox03_loc = glGetUniformLocation(skybox_shader_program, "cubemap03");
+	if (skybox03_loc != -1)
+	{
+		glUniform1i(skybox03_loc, 3); // we bound our texture to texture unit 1
+	}
+	int skybox04_loc = glGetUniformLocation(skybox_shader_program, "cubemap04");
+	if (skybox04_loc != -1)
+	{
+		glUniform1i(skybox04_loc, 4); // we bound our texture to texture unit 1
+	}
+	int skybox05_loc = glGetUniformLocation(skybox_shader_program, "cubemap05");
+	if (skybox05_loc != -1)
+	{
+		glUniform1i(skybox05_loc, 5); // we bound our texture to texture unit 1
+	}
+	int skybox06_loc = glGetUniformLocation(skybox_shader_program, "cubemap06");
+	if (skybox06_loc != -1)
+	{
+		glUniform1i(skybox06_loc, 6); // we bound our texture to texture unit 1
+	}
+	int skybox07_loc = glGetUniformLocation(skybox_shader_program, "cubemap07");
+	if (skybox07_loc != -1)
+	{
+		glUniform1i(skybox07_loc, 7); // we bound our texture to texture unit 1
+	}
+	int skybox08_loc = glGetUniformLocation(skybox_shader_program, "cubemap08");
+	if (skybox08_loc != -1)
+	{
+		glUniform1i(skybox08_loc, 8); // we bound our texture to texture unit 1
+	}
+	int skybox09_loc = glGetUniformLocation(skybox_shader_program, "cubemap09");
+	if (skybox09_loc != -1)
+	{
+		glUniform1i(skybox09_loc, 9); // we bound our texture to texture unit 1
+	}
+	int skybox10_loc = glGetUniformLocation(skybox_shader_program, "cubemap10");
+	if (skybox10_loc != -1)
+	{
+		glUniform1i(skybox10_loc, 10); // we bound our texture to texture unit 1
+	}
+	int skybox11_loc = glGetUniformLocation(skybox_shader_program, "cubemap11");
+	if (skybox11_loc != -1)
+	{
+		glUniform1i(skybox11_loc, 11); // we bound our texture to texture unit 1
+	}
+	int skybox12_loc = glGetUniformLocation(skybox_shader_program, "cubemap12");
+	if (skybox12_loc != -1)
+	{
+		glUniform1i(skybox12_loc, 12); // we bound our texture to texture unit 1
+	}
+	int skybox13_loc = glGetUniformLocation(skybox_shader_program, "cubemap13");
+	if (skybox13_loc != -1)
+	{
+		glUniform1i(skybox13_loc, 13); // we bound our texture to texture unit 1
+	}
+	int skybox14_loc = glGetUniformLocation(skybox_shader_program, "cubemap14");
+	if (skybox14_loc != -1)
+	{
+		glUniform1i(skybox14_loc, 14); // we bound our texture to texture unit 1
+	}
+	int skybox15_loc = glGetUniformLocation(skybox_shader_program, "cubemap15");
+	if (skybox15_loc != -1)
+	{
+		glUniform1i(skybox15_loc, 15); // we bound our texture to texture unit 1
+	}
+
+	glDepthMask(GL_FALSE);
+	glBindVertexArray(cube_vao);
+	draw_skybox(cube_vao);
+	glDepthMask(GL_TRUE);
 }
 
 void draw_cubes(const glm::mat4& P, const glm::mat4& V)
@@ -83,6 +219,25 @@ void draw_cubes(const glm::mat4& P, const glm::mat4& V)
 	glActiveTexture(GL_TEXTURE2);
 	glBindTexture(GL_TEXTURE_2D, grass_cube_side_texture_id);
 
+	glUseProgram(cube_shader_program);
+	int dirt_tex_loc = glGetUniformLocation(cube_shader_program, "Texture0");
+	if (dirt_tex_loc != -1)
+	{
+		glUniform1i(dirt_tex_loc, 0);
+	}
+
+	int grass_top_tex_loc = glGetUniformLocation(cube_shader_program, "Texture1");
+	if (grass_top_tex_loc != -1)
+	{
+		glUniform1i(grass_top_tex_loc, 1);
+	}
+
+	int grass_side_tex_loc = glGetUniformLocation(cube_shader_program, "Texture2");
+	if (grass_side_tex_loc != -1)
+	{
+		glUniform1i(grass_side_tex_loc, 2);
+	}
+
 	glBindVertexArray(cube_vao);
 	draw_cubes(cube_vao);
 }
@@ -97,6 +252,7 @@ void display()
 	glm::mat4 V = glm::lookAt(player.position, player.Target(), glm::vec3(0.0f, 1.0f, 0.0f));
 	glm::mat4 P = glm::perspective(80.0f, aspect, 0.1f, 100.0f); //not affine
 
+	draw_skybox(P, V);
 	draw_cubes(P, V);
 
 	draw_gui();
@@ -111,10 +267,16 @@ void idle()
 	float time_sec = 0.001f * time_ms;
 
 	glUseProgram(cube_shader_program);
-	int time_loc = glGetUniformLocation(cube_shader_program, "time");
+	int time_loc = glGetUniformLocation(cube_shader_program, "time_sec");
 	if (time_loc != -1)
 	{
-		//double check that you are using glUniform1f
+		glUniform1f(time_loc, time_sec);
+	}
+
+	glUseProgram(skybox_shader_program);
+	time_loc = glGetUniformLocation(skybox_shader_program, "time_sec");
+	if (time_loc != -1)
+	{
 		glUniform1f(time_loc, time_sec);
 	}
 }
@@ -150,10 +312,17 @@ void initOpenGl()
 	glEnable(GL_PROGRAM_POINT_SIZE); //allows us to set point size in vertex shader
 	glClearColor(0.65f, 0.65f, 0.65f, 1.0f);
 
+	for (int i = 0; i < 15; i++)
+	{
+		skybox_id[i] = LoadCube(skybox_name[i]);
+	}
+	
+	skybox_shader_program = InitShader(skybox_vs.c_str(), skybox_fs.c_str());
 	cube_shader_program = InitShader(cube_vs.c_str(), cube_fs.c_str());
 
 	init_map();
 
+	skybox_vao = create_cube_vao();
 	cube_vao = create_cube_vao();
 
 	ImGui_ImplGlut_Init(); // initialize the imgui system
@@ -161,29 +330,6 @@ void initOpenGl()
 	dirt_texture_id = LoadTexture(dirt_texture_name);
 	grass_cube_top_texture_id = LoadTexture(grass_cube_top_texture_name);
 	grass_cube_side_texture_id = LoadTexture(grass_cube_side_texture_name);
-
-	glUseProgram(cube_shader_program);
-	int dirt_tex_loc = glGetUniformLocation(cube_shader_program, "Texture0");
-	if (dirt_tex_loc != -1)
-	{
-		//double check that you are using glUniform1f
-		glUniform1i(dirt_tex_loc, 0);
-	}
-
-	int grass_top_tex_loc = glGetUniformLocation(cube_shader_program, "Texture1");
-	if (grass_top_tex_loc != -1)
-	{
-		//double check that you are using glUniform1f
-		glUniform1i(grass_top_tex_loc, 1);
-	}
-
-	int grass_side_tex_loc = glGetUniformLocation(cube_shader_program, "Texture2");
-	if (grass_side_tex_loc != -1)
-	{
-		//double check that you are using glUniform1f
-		glUniform1i(grass_side_tex_loc, 2);
-	}
-
 	
 	SetCursorPos(mouseX, mouseY);
 }

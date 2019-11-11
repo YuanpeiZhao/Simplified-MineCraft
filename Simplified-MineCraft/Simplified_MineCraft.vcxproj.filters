@@ -51,6 +51,9 @@
     <ClCompile Include="GameManager.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="Skybox.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="InitShader.h">
@@ -92,12 +95,21 @@
     <ClInclude Include="GameManager.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="Skybox.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="cube_fs.glsl">
       <Filter>资源文件</Filter>
     </None>
     <None Include="cube_vs.glsl">
+      <Filter>资源文件</Filter>
+    </None>
+    <None Include="skybox_fs.glsl">
+      <Filter>资源文件</Filter>
+    </None>
+    <None Include="skybox_vs.glsl">
       <Filter>资源文件</Filter>
     </None>
   </ItemGroup>
