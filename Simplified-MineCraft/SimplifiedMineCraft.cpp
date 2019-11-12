@@ -205,6 +205,8 @@ void draw_skybox(const glm::mat4& P, const glm::mat4& V)
 
 void draw_cubes(const glm::mat4& P, const glm::mat4& V)
 {
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glUseProgram(cube_shader_program);
 	glm::mat4 R = glm::rotate(0.0f, glm::vec3(1.0f, 0.0f, 0.0f));
 	glm::mat4 M = R * glm::scale(glm::vec3(1.0f));
@@ -300,7 +302,7 @@ void display()
 	glm::mat4 V = glm::lookAt(player.position, player.Target(), glm::vec3(0.0f, 1.0f, 0.0f));
 	glm::mat4 P = glm::perspective(80.0f, aspect, 0.1f, 100.0f); //not affine
 
-	//draw_skybox(P, V);
+	draw_skybox(P, V);
 	draw_cubes(P, V);
 
 	draw_gui();
@@ -362,7 +364,7 @@ void initOpenGl()
 
 	for (int i = 0; i < 15; i++)
 	{
-		//skybox_id[i] = LoadCube(skybox_name[i]);
+		skybox_id[i] = LoadCube(skybox_name[i]);
 	}
 	
 	skybox_shader_program = InitShader(skybox_vs.c_str(), skybox_fs.c_str());
