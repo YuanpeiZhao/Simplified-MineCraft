@@ -244,6 +244,8 @@ void draw_plane(const glm::mat4& P, const glm::mat4& V)
 
 void draw_cubes(const glm::mat4& P, const glm::mat4& V)
 {
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glUseProgram(cube_shader_program);
 	glm::mat4 R = glm::rotate(0.0f, glm::vec3(1.0f, 0.0f, 0.0f));
 	glm::mat4 M = R * glm::scale(glm::vec3(1.0f));
