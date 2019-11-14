@@ -60,8 +60,8 @@ float camangle = 0.0f;
 glm::vec3 campos(3.0f, 3.0f, 3.0f);
 float aspect = 1.0f;
 
-
-float mouseX = 320.0f, mouseY = 320.0f;
+float win_w = 640.0f, win_h = 640.0f;
+float mouseX = win_w / 2, mouseY = win_h / 2;
 float verAxis = 0.0f, horAxis = 0.0f;
 Player player(glm::vec3(0.0f, 15.0f, 0.0f), glm::vec3(0.0f, 0.0f, -1.0f));
 
@@ -361,6 +361,7 @@ void initOpenGl()
 	glEnable(GL_POINT_SPRITE);       // allows textured points
 	glEnable(GL_PROGRAM_POINT_SIZE); //allows us to set point size in vertex shader
 	glClearColor(0.65f, 0.65f, 0.65f, 1.0f);
+	glutSetCursor(GLUT_CURSOR_NONE);
 
 	for (int i = 0; i < 15; i++)
 	{
@@ -388,6 +389,7 @@ void initOpenGl()
 	water_still_texture_id = LoadTexture(water_still_texture_name);
 	
 	SetCursorPos(mouseX, mouseY);
+	
 }
 
 // glut callbacks need to send keyboard and mouse events to imgui
@@ -436,11 +438,16 @@ void keyboard_up(unsigned char key, int x, int y) {
 }
 
 void motion(int x, int y)
-{	
+{
 	player.OnMouseMove(mouseX - x, mouseY - y);
 	mouseX = x;
 	mouseY = y;
 	
+	
+	glutWarpPointer(win_w / 2, win_h / 2);
+	mouseX = win_w / 2;
+	mouseY = win_h / 2;
+
 }
 
 
@@ -453,15 +460,15 @@ void reshape(int w, int h)
 
 int main(int argc, char** argv)
 {
+	
 	//Configure initial window state
 	glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA | GLUT_DEPTH);
 	glutInitWindowPosition(0, 0);
-	glutInitWindowSize(640, 640);
+	glutInitWindowSize(win_w, win_h);
 	int win = glutCreateWindow("Simplified MineCraft");
 	
 	printGlInfo();
-
 	//Register callback functions with glut. 
 	glutDisplayFunc(display);
 	
