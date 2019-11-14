@@ -49,6 +49,12 @@ static const std::string cube_fs("cube_fs.glsl");
 GLuint cube_shader_program = -1;
 GLuint cube_vao = -1;
 
+//Plane files and IDs
+static const std::string plane_vs("plane_vs.glsl");
+static const std::string plane_fs("plane_fs.glsl");
+GLuint plane_shader_program = -1;
+GLuint plane_vao = -1;
+
 //Skybox files and IDs
 static const std::string skybox_vs("skybox_vs.glsl");
 static const std::string skybox_fs("skybox_fs.glsl");
@@ -198,8 +204,43 @@ void draw_skybox(const glm::mat4& P, const glm::mat4& V)
 	}
 
 	glDepthMask(GL_FALSE);
-	glBindVertexArray(cube_vao);
-	draw_skybox(cube_vao);
+	glBindVertexArray(skybox_vao);
+	draw_skybox(skybox_vao);
+	glDepthMask(GL_TRUE);
+}
+
+void draw_plane(const glm::mat4& P, const glm::mat4& V)
+{
+	glUseProgram(plane_shader_program);
+	glm::mat4 R = glm::rotate(0.0f, glm::vec3(1.0f, 0.0f, 0.0f));
+	glm::mat4 M = R * glm::scale(glm::vec3(1.0f));
+
+	int M_loc = glGetUniformLocation(plane_shader_program, "M");
+	if (M_loc != -1)
+	{
+		glUniformMatrix4fv(M_loc, 1, false, glm::value_ptr(M));
+	}
+
+	int PVM_loc = glGetUniformLocation(plane_shader_program, "PVM");
+	if (PVM_loc != -1)
+	{
+		glm::mat4 PVM = P * V * M;
+		glUniformMatrix4fv(PVM_loc, 1, false, glm::value_ptr(PVM));
+	}
+
+	// grassCube Textures
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, dirt_texture_id);
+
+	int dirt_tex_loc = glGetUniformLocation(plane_shader_program, "dirt_tex");
+	if (dirt_tex_loc != -1)
+	{
+		glUniform1i(dirt_tex_loc, 0);
+	}
+
+	glDepthMask(GL_FALSE);
+	glBindVertexArray(plane_vao);
+	draw_plane(plane_vao);
 	glDepthMask(GL_TRUE);
 }
 
@@ -303,7 +344,9 @@ void display()
 	glm::mat4 P = glm::perspective(80.0f, aspect, 0.1f, 100.0f); //not affine
 
 	draw_skybox(P, V);
+	draw_plane(P, V);
 	draw_cubes(P, V);
+	
 
 	draw_gui();
 	glutSwapBuffers();
@@ -358,6 +401,7 @@ void initOpenGl()
 {
 	glewInit();
 	glEnable(GL_DEPTH_TEST);
+	glEnable(GL_CULL_FACE);
 	glEnable(GL_POINT_SPRITE);       // allows textured points
 	glEnable(GL_PROGRAM_POINT_SIZE); //allows us to set point size in vertex shader
 	glClearColor(0.65f, 0.65f, 0.65f, 1.0f);
@@ -365,16 +409,18 @@ void initOpenGl()
 
 	for (int i = 0; i < 15; i++)
 	{
-		skybox_id[i] = LoadCube(skybox_name[i]);
+		//skybox_id[i] = LoadCube(skybox_name[i]);
 	}
 	
 	skybox_shader_program = InitShader(skybox_vs.c_str(), skybox_fs.c_str());
 	cube_shader_program = InitShader(cube_vs.c_str(), cube_fs.c_str());
+	plane_shader_program = InitShader(plane_vs.c_str(), plane_fs.c_str());
 
 	init_map();
 
-	skybox_vao = create_cube_vao();
+	skybox_vao = create_skybox_vao();
 	cube_vao = create_cube_vao();
+	plane_vao = create_plane_vao();
 
 	ImGui_ImplGlut_Init(); // initialize the imgui system
 
@@ -389,7 +435,6 @@ void initOpenGl()
 	water_still_texture_id = LoadTexture(water_still_texture_name);
 	
 	SetCursorPos(mouseX, mouseY);
-	
 }
 
 // glut callbacks need to send keyboard and mouse events to imgui
@@ -438,16 +483,14 @@ void keyboard_up(unsigned char key, int x, int y) {
 }
 
 void motion(int x, int y)
-{
+{	
 	player.OnMouseMove(mouseX - x, mouseY - y);
 	mouseX = x;
 	mouseY = y;
 	
-	
 	glutWarpPointer(win_w / 2, win_h / 2);
 	mouseX = win_w / 2;
 	mouseY = win_h / 2;
-
 }
 
 
@@ -460,7 +503,6 @@ void reshape(int w, int h)
 
 int main(int argc, char** argv)
 {
-	
 	//Configure initial window state
 	glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA | GLUT_DEPTH);
@@ -469,6 +511,7 @@ int main(int argc, char** argv)
 	int win = glutCreateWindow("Simplified MineCraft");
 	
 	printGlInfo();
+
 	//Register callback functions with glut. 
 	glutDisplayFunc(display);
 	
@@ -486,4 +529,5 @@ int main(int argc, char** argv)
 	glutMainLoop();
 	glutDestroyWindow(win);
 	return 0;
+
 }
