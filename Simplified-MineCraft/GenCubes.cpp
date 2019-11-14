@@ -5,6 +5,8 @@
 
 //static int N = 50;
 
+float surf_verts[9 * 36 * 220];
+
 float basic[] = {
 	// positions          // normals           // texture coords
 	-0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  1.0f,  0.0f,
@@ -52,6 +54,11 @@ float basic[] = {
 
 void init_map()
 {
+
+	for (int i = -99; i < 100; i++)
+	{
+		cubeList.push_back(Cube(GRASS_CUBE, glm::vec3(-100.0f, 10.0f, float(i))));
+	}
 	
 	cubeList.push_back(Cube(GRASS_CUBE, glm::vec3(0.0f, 0.0f, 0.0f)));
 	cubeList.push_back(Cube(GRASS_CUBE, glm::vec3(4.0f, 0.0f, 0.0f)));
@@ -80,7 +87,6 @@ void init_map()
 GLuint create_cube_vbo()
 {
 	//Declare a vector to hold N vertices
-	float surf_verts[9 * 36 * 20];
 
 	for (int i = 0; i < cubeList.size(); i++)
 	{

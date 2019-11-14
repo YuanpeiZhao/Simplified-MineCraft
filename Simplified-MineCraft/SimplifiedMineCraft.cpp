@@ -342,8 +342,9 @@ void display()
 	glm::mat4 P = glm::perspective(80.0f, aspect, 0.1f, 100.0f); //not affine
 
 	draw_skybox(P, V);
-	draw_cubes(P, V);
 	draw_plane(P, V);
+	draw_cubes(P, V);
+	
 
 	draw_gui();
 	glutSwapBuffers();
