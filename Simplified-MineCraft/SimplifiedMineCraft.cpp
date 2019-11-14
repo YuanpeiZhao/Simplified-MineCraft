@@ -238,8 +238,10 @@ void draw_plane(const glm::mat4& P, const glm::mat4& V)
 		glUniform1i(dirt_tex_loc, 0);
 	}
 
+	glDepthMask(GL_FALSE);
 	glBindVertexArray(plane_vao);
 	draw_plane(plane_vao);
+	glDepthMask(GL_TRUE);
 }
 
 void draw_cubes(const glm::mat4& P, const glm::mat4& V)
@@ -399,13 +401,14 @@ void initOpenGl()
 {
 	glewInit();
 	glEnable(GL_DEPTH_TEST);
+	glEnable(GL_CULL_FACE);
 	glEnable(GL_POINT_SPRITE);       // allows textured points
 	glEnable(GL_PROGRAM_POINT_SIZE); //allows us to set point size in vertex shader
 	glClearColor(0.65f, 0.65f, 0.65f, 1.0f);
 
 	for (int i = 0; i < 15; i++)
 	{
-		skybox_id[i] = LoadCube(skybox_name[i]);
+		//skybox_id[i] = LoadCube(skybox_name[i]);
 	}
 	
 	skybox_shader_program = InitShader(skybox_vs.c_str(), skybox_fs.c_str());

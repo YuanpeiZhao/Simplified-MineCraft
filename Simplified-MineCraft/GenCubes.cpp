@@ -5,16 +5,16 @@
 
 //static int N = 50;
 
-float surf_verts[9 * 36 * 220];
+float surf_verts[9 * 36 * 3000];
 
 float basic[] = {
 	// positions          // normals           // texture coords
 	-0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  1.0f,  0.0f,
+	 0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  0.0f,  1.0f,
 	 0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  0.0f,  0.0f,
 	 0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  0.0f,  1.0f,
-	 0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  0.0f,  1.0f,
-	-0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  1.0f,  1.0f,
 	-0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  1.0f,  0.0f,
+	-0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  1.0f,  1.0f,
 
 	-0.5f, -0.5f,  0.5f,  0.0f,  0.0f,  1.0f,  1.0f,  0.0f,
 	 0.5f, -0.5f,  0.5f,  0.0f,  0.0f,  1.0f,  0.0f,  0.0f,
@@ -31,11 +31,11 @@ float basic[] = {
 	-0.5f,  0.5f,  0.5f, -1.0f,  0.0f,  0.0f,  0.0f,  1.0f,
 
 	 0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,  0.0f,  1.0f,
+	 0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,  1.0f,  0.0f,
 	 0.5f,  0.5f, -0.5f,  1.0f,  0.0f,  0.0f,  1.0f,  1.0f,
 	 0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,  1.0f,  0.0f,
-	 0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,  1.0f,  0.0f,
-	 0.5f, -0.5f,  0.5f,  1.0f,  0.0f,  0.0f,  0.0f,  0.0f,
 	 0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,  0.0f,  1.0f,
+	 0.5f, -0.5f,  0.5f,  1.0f,  0.0f,  0.0f,  0.0f,  0.0f,
 
 	-0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,  1.0f,  1.0f,
 	 0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,  0.0f,  1.0f,
@@ -45,43 +45,40 @@ float basic[] = {
 	-0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,  1.0f,  1.0f,
 
 	-0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,  1.0f,  1.0f,
+	 0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,  0.0f,  0.0f,
 	 0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,  0.0f,  1.0f,
 	 0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,  0.0f,  0.0f,
-	 0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,  0.0f,  0.0f,
-	-0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,  1.0f,  0.0f,
-	-0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,  1.0f,  1.0f
+	-0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,  1.0f,  1.0f,
+	-0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,  1.0f,  0.0f
 };
 
 void init_map()
 {
 
-	for (int i = -99; i < 100; i++)
+	for (int i = -20; i < 20; i++)
 	{
-		cubeList.push_back(Cube(GRASS_CUBE, glm::vec3(-100.0f, 10.0f, float(i))));
+		for (int j = -20; j < 20; j++)
+		{
+			cubeList.push_back(Cube(GRASS_CUBE, glm::vec3(float(i), 0.0f, float(j))));
+		}
 	}
 	
-	cubeList.push_back(Cube(GRASS_CUBE, glm::vec3(0.0f, 0.0f, 0.0f)));
-	cubeList.push_back(Cube(GRASS_CUBE, glm::vec3(4.0f, 0.0f, 0.0f)));
-	cubeList.push_back(Cube(GRASS_CUBE, glm::vec3(6.0f, 0.0f, 0.0f)));
-	cubeList.push_back(Cube(GRASS_CUBE, glm::vec3(0.0f, 0.0f, 4.0f)));
 	cubeList.push_back(Cube(GRASS_CUBE, glm::vec3(0.0f, 3.0f, 6.0f)));
 
 	cubeList.push_back(Cube(LEAF_CUBE, glm::vec3(0.0f, 1.0f, 0.0f)));
 	cubeList.push_back(Cube(LEAF_CUBE, glm::vec3(0.0f, -1.0f, 0.0f)));
-	cubeList.push_back(Cube(LEAF_CUBE, glm::vec3(1.0f, 0.0f, 0.0f)));
 	cubeList.push_back(Cube(LEAF_CUBE, glm::vec3(1.0f, 1.0f, 0.0f)));
 	cubeList.push_back(Cube(LEAF_CUBE, glm::vec3(1.0f, -1.0f, 0.0f)));
-	cubeList.push_back(Cube(LEAF_CUBE, glm::vec3(-1.0f, 0.0f, 0.0f)));
 	cubeList.push_back(Cube(LEAF_CUBE, glm::vec3(-1.0f, 1.0f, 0.0f)));
 	cubeList.push_back(Cube(LEAF_CUBE, glm::vec3(-1.0f, -1.0f, 0.0f)));
+
+	cubeList.push_back(Cube(TREE_CUBE, glm::vec3(0.0f, 1.0f, 2.0f)));
+	cubeList.push_back(Cube(TREE_CUBE, glm::vec3(1.0f, 1.0f, 2.0f)));
+	cubeList.push_back(Cube(TREE_CUBE, glm::vec3(-1.0f, 1.0f, 2.0f)));
 
 	cubeList.push_back(Cube(WATER_CUBE, glm::vec3(0.0f, 2.0f, 1.0f)));
 	cubeList.push_back(Cube(WATER_CUBE, glm::vec3(1.0f, 2.0f, 1.0f)));
 	cubeList.push_back(Cube(WATER_CUBE, glm::vec3(-1.0f, 2.0f, 1.0f)));
-
-	cubeList.push_back(Cube(TREE_CUBE, glm::vec3(0.0f, 0.0f, 2.0f)));
-	cubeList.push_back(Cube(TREE_CUBE, glm::vec3(1.0f, 0.0f, 2.0f)));
-	cubeList.push_back(Cube(TREE_CUBE, glm::vec3(-1.0f, 0.0f, 2.0f)));
 }
 
 GLuint create_cube_vbo()
