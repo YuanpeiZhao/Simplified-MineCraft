@@ -8,3 +8,4 @@
 extern const int deltaTime;
 extern const float DeltaTime;
 extern std::vector<Cube> cubeList;
+extern std::vector<Cube> translucentCubeList;

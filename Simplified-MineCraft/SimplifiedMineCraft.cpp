@@ -1,5 +1,6 @@
 #include <windows.h>
 #include <iostream>
+#include <map>
 
 #include <GL/glew.h>
 #include <GL/freeglut.h>
@@ -48,6 +49,7 @@ static const std::string cube_vs("cube_vs.glsl");
 static const std::string cube_fs("cube_fs.glsl");
 GLuint cube_shader_program = -1;
 GLuint cube_vao = -1;
+GLuint trans_cube_vao = -1;
 
 //Plane files and IDs
 static const std::string plane_vs("plane_vs.glsl");
@@ -246,6 +248,16 @@ void draw_plane(const glm::mat4& P, const glm::mat4& V)
 
 void draw_cubes(const glm::mat4& P, const glm::mat4& V)
 {
+	//glBufferSubData
+	std::map<float, glm::vec3> sorted;
+	for (unsigned int i = 0; i < translucentCubeList.size(); i++)
+	{
+		float distance = glm::length(player.position - translucentCubeList[i].position);
+		sorted[distance] = translucentCubeList[i].position;
+	}
+
+	sortTranslucentCubeVBO(sorted);
+
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glUseProgram(cube_shader_program);
@@ -331,6 +343,11 @@ void draw_cubes(const glm::mat4& P, const glm::mat4& V)
 
 	glBindVertexArray(cube_vao);
 	draw_cubes(cube_vao);
+
+	glEnable(GL_CULL_FACE);
+	glBindVertexArray(trans_cube_vao);
+	draw_trans_cubes(trans_cube_vao);
+	glDisable(GL_CULL_FACE);
 }
 
 // glut display callback function.
@@ -346,7 +363,6 @@ void display()
 	draw_skybox(P, V);
 	draw_plane(P, V);
 	draw_cubes(P, V);
-	
 
 	draw_gui();
 	glutSwapBuffers();
@@ -376,14 +392,11 @@ void idle()
 
 void Timer(int value) {	
 	
-		glm::vec3 dir = player.Forward() * verAxis * player.step + player.Right() * horAxis * player.step;
-		player.velocity.x = dir.x;
-		player.velocity.z = dir.z;
+	glm::vec3 dir = player.Forward() * verAxis * player.step + player.Right() * horAxis * player.step;
+	player.velocity.x = dir.x;
+	player.velocity.z = dir.z;
 	
-	
-
 	player.Update();
-
 
 	glutPostRedisplay();
 	glutTimerFunc(deltaTime, Timer, 1);
@@ -401,7 +414,6 @@ void initOpenGl()
 {
 	glewInit();
 	glEnable(GL_DEPTH_TEST);
-	glEnable(GL_CULL_FACE);
 	glEnable(GL_POINT_SPRITE);       // allows textured points
 	glEnable(GL_PROGRAM_POINT_SIZE); //allows us to set point size in vertex shader
 	glClearColor(0.65f, 0.65f, 0.65f, 1.0f);
@@ -420,6 +432,7 @@ void initOpenGl()
 
 	skybox_vao = create_skybox_vao();
 	cube_vao = create_cube_vao();
+	trans_cube_vao = create_trans_cube_vao();
 	plane_vao = create_plane_vao();
 
 	ImGui_ImplGlut_Init(); // initialize the imgui system
