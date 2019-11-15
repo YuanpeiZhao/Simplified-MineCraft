@@ -7,5 +7,6 @@ CGT 520 Final Project
 * 11.10.2019 Skybox that can change from daytime to night.
 * 11.11.2019 Oak trees and flowing water.
 * 11.12.2019 Now water is translucent.
-still some bugs of translucent to be fixed!!
+* 11.14.2019 Translucent water bug fixed.
+## Use redefineCubeVBO() after destroying or creating a cube!!!
 * All rights reserved.
