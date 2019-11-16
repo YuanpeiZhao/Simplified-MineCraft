@@ -118,5 +118,11 @@
     <None Include="plane_vs.glsl">
       <Filter>资源文件</Filter>
     </None>
+    <None Include="shadow_fs.glsl">
+      <Filter>资源文件</Filter>
+    </None>
+    <None Include="shadow_vs.glsl">
+      <Filter>资源文件</Filter>
+    </None>
   </ItemGroup>
 </Project>

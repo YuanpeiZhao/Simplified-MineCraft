@@ -40,6 +40,12 @@ GLuint tree_leaves_texture_id = -1;
 static const std::string water_still_texture_name = "textures/waterBlock/water_still.png";
 GLuint water_still_texture_id = -1;
 
+//Light and Shadow
+vec3 sunlightPos = vec3(0.0f, 0.0f, 0.0f);
+GLuint depthMap;
+GLuint depthMapFBO;
+glm::mat4 lightSpaceMatrix;
+
 static const std::string skybox_name[15] = { "cubemap\\01", "cubemap\\02", "cubemap\\03", "cubemap\\04", "cubemap\\05", "cubemap\\06", "cubemap\\07", "cubemap\\08", 
 "cubemap\\09", "cubemap\\10", "cubemap\\11",  "cubemap\\12",  "cubemap\\13",  "cubemap\\14",  "cubemap\\15", };
 GLuint skybox_id[15] = { -1 }; //Texture id for cubemap
@@ -62,6 +68,11 @@ static const std::string skybox_vs("skybox_vs.glsl");
 static const std::string skybox_fs("skybox_fs.glsl");
 GLuint skybox_shader_program = -1;
 GLuint skybox_vao = -1;
+
+//Shadow files and IDs
+static const std::string shadow_vs("shadow_vs.glsl");
+static const std::string shadow_fs("shadow_fs.glsl");
+GLuint shadow_shader_program = -1;
 
 //camera and viewport
 float camangle = 0.0f;
@@ -240,6 +251,15 @@ void draw_plane(const glm::mat4& P, const glm::mat4& V)
 		glUniform1i(dirt_tex_loc, 0);
 	}
 
+	glActiveTexture(GL_TEXTURE1);
+	glBindTexture(GL_TEXTURE_2D, depthMap);
+
+	int depthMap_loc = glGetUniformLocation(plane_shader_program, "depthMap");
+	if (depthMap_loc != -1)
+	{
+		glUniform1i(depthMap_loc, 1);
+	}
+
 	glDepthMask(GL_FALSE);
 	glBindVertexArray(plane_vao);
 	draw_plane(plane_vao);
@@ -277,6 +297,12 @@ void draw_cubes(const glm::mat4& P, const glm::mat4& V)
 		glUniformMatrix4fv(PVM_loc, 1, false, glm::value_ptr(PVM));
 	}
 
+	int lightSpaceM_loc = glGetUniformLocation(cube_shader_program, "lightSpaceMatrix");
+	if (lightSpaceM_loc != -1)
+	{
+		glUniformMatrix4fv(lightSpaceM_loc, 1, false, glm::value_ptr(lightSpaceMatrix));
+	}
+
 	// grassCube Textures
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, dirt_texture_id);
@@ -285,7 +311,6 @@ void draw_cubes(const glm::mat4& P, const glm::mat4& V)
 	glActiveTexture(GL_TEXTURE2);
 	glBindTexture(GL_TEXTURE_2D, grass_cube_side_texture_id);
 
-	glUseProgram(cube_shader_program);
 	int dirt_tex_loc = glGetUniformLocation(cube_shader_program, "dirt_tex");
 	if (dirt_tex_loc != -1)
 	{
@@ -312,7 +337,6 @@ void draw_cubes(const glm::mat4& P, const glm::mat4& V)
 	glActiveTexture(GL_TEXTURE5);
 	glBindTexture(GL_TEXTURE_2D, tree_leaves_texture_id);
 
-	glUseProgram(cube_shader_program);
 	int tree_log_tex_loc = glGetUniformLocation(cube_shader_program, "tree_log_tex");
 	if (tree_log_tex_loc != -1)
 	{
@@ -334,11 +358,20 @@ void draw_cubes(const glm::mat4& P, const glm::mat4& V)
 	glActiveTexture(GL_TEXTURE6);
 	glBindTexture(GL_TEXTURE_2D, water_still_texture_id);
 
-	glUseProgram(cube_shader_program);
 	int water_still_tex_loc = glGetUniformLocation(cube_shader_program, "water_still_tex");
 	if (water_still_tex_loc != -1)
 	{
 		glUniform1i(water_still_tex_loc, 6);
+	}
+
+	//Shadow Map
+	glActiveTexture(GL_TEXTURE7);
+	glBindTexture(GL_TEXTURE_2D, depthMap);
+
+	int depthMap_loc = glGetUniformLocation(cube_shader_program, "shadowMap");
+	if (depthMap_loc != -1)
+	{
+		glUniform1i(depthMap_loc, 7);
 	}
 
 	glBindVertexArray(cube_vao);
@@ -348,6 +381,49 @@ void draw_cubes(const glm::mat4& P, const glm::mat4& V)
 	glBindVertexArray(trans_cube_vao);
 	draw_trans_cubes(trans_cube_vao);
 	glDisable(GL_CULL_FACE);
+}
+
+void drawShadowMap()
+{
+
+	glViewport(0, 0, SHADOW_WIDTH, SHADOW_HEIGHT);
+	glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
+	glClear(GL_DEPTH_BUFFER_BIT);
+
+	GLfloat near_plane = 0.1f, far_plane = 50.0f;
+	glm::mat4 lightProjection = glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f, near_plane, far_plane);
+	glm::mat4 lightView = glm::lookAt(sunlightPos, glm::vec3(0.0f), glm::vec3(1.0));
+	lightSpaceMatrix = lightProjection * lightView;
+
+	glm::mat4 R = glm::rotate(0.0f, glm::vec3(1.0f, 0.0f, 0.0f));
+	glm::mat4 M = R * glm::scale(glm::vec3(1.0f));
+
+	glUseProgram(shadow_shader_program);
+	int M_loc = glGetUniformLocation(shadow_shader_program, "model");
+	if (M_loc != -1)
+	{
+		glUniformMatrix4fv(M_loc, 1, false, glm::value_ptr(M));
+	}
+
+	int lightSpaceM_loc = glGetUniformLocation(shadow_shader_program, "lightSpaceMatrix");
+	if (lightSpaceM_loc != -1)
+	{
+		glUniformMatrix4fv(lightSpaceM_loc, 1, false, glm::value_ptr(lightSpaceMatrix));
+	}
+
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, tree_leaves_texture_id);
+	int tree_leaves_tex_loc = glGetUniformLocation(shadow_shader_program, "tree_leaves_tex");
+	if (tree_leaves_tex_loc != -1)
+	{
+		glUniform1i(tree_leaves_tex_loc, 0);
+	}
+
+	glBindVertexArray(cube_vao);
+	draw_cubes(cube_vao);
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+	glViewport(0, 0, win_w, win_h);
 }
 
 // glut display callback function.
@@ -361,6 +437,7 @@ void display()
 	glm::mat4 P = glm::perspective(80.0f, aspect, 0.1f, 100.0f); //not affine
 
 	draw_skybox(P, V);
+	drawShadowMap();
 	draw_plane(P, V);
 	draw_cubes(P, V);
 
@@ -375,11 +452,20 @@ void idle()
 	const int time_ms = glutGet(GLUT_ELAPSED_TIME);
 	float time_sec = 0.001f * time_ms;
 
+	float t = (time_sec - int(time_sec / int(cycleTime)) * cycleTime) / cycleTime;
+	float angle = t * 3.1415926f;
+	sunlightPos = vec3(cos(angle), sin(angle), 0.5f) * 10.0f;
+
 	glUseProgram(cube_shader_program);
 	int time_loc = glGetUniformLocation(cube_shader_program, "time_sec");
 	if (time_loc != -1)
 	{
 		glUniform1f(time_loc, time_sec);
+	}
+	int cycle_time_loc = glGetUniformLocation(cube_shader_program, "cycle_time_sec");
+	if (cycle_time_loc != -1)
+	{
+		glUniform1f(cycle_time_loc, cycleTime);
 	}
 
 	glUseProgram(skybox_shader_program);
@@ -387,6 +473,12 @@ void idle()
 	if (time_loc != -1)
 	{
 		glUniform1f(time_loc, time_sec);
+	}
+
+	cycle_time_loc = glGetUniformLocation(skybox_shader_program, "cycle_time_sec");
+	if (cycle_time_loc != -1)
+	{
+		glUniform1f(cycle_time_loc, cycleTime);
 	}
 }
 
@@ -410,6 +502,28 @@ void printGlInfo()
 	std::cout << "GLSL Version: " << glGetString(GL_SHADING_LANGUAGE_VERSION) << std::endl;
 }
 
+void init_shadow_map()
+{
+	glGenFramebuffers(1, &depthMapFBO);
+
+	glGenTextures(1, &depthMap);
+	glBindTexture(GL_TEXTURE_2D, depthMap);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT,
+		SHADOW_WIDTH, SHADOW_HEIGHT, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
+	GLfloat borderColor[] = { 1.0, 1.0, 1.0, 1.0 };
+	glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, borderColor);
+
+	glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, depthMap, 0);
+	glDrawBuffer(GL_NONE);
+	glReadBuffer(GL_NONE);
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+}
+
 void initOpenGl()
 {
 	glewInit();
@@ -421,14 +535,16 @@ void initOpenGl()
 
 	for (int i = 0; i < 15; i++)
 	{
-		//skybox_id[i] = LoadCube(skybox_name[i]);
+		skybox_id[i] = LoadCube(skybox_name[i]);
 	}
 	
 	skybox_shader_program = InitShader(skybox_vs.c_str(), skybox_fs.c_str());
 	cube_shader_program = InitShader(cube_vs.c_str(), cube_fs.c_str());
 	plane_shader_program = InitShader(plane_vs.c_str(), plane_fs.c_str());
+	shadow_shader_program = InitShader(shadow_vs.c_str(), shadow_fs.c_str());
 
 	init_map();
+	init_shadow_map();
 
 	skybox_vao = create_skybox_vao();
 	cube_vao = create_cube_vao();

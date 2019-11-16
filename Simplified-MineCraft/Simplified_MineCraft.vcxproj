@@ -175,6 +175,8 @@
     <None Include="cube_vs.glsl" />
     <None Include="plane_fs.glsl" />
     <None Include="plane_vs.glsl" />
+    <None Include="shadow_fs.glsl" />
+    <None Include="shadow_vs.glsl" />
     <None Include="skybox_fs.glsl" />
     <None Include="skybox_vs.glsl" />
   </ItemGroup>

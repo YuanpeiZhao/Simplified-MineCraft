@@ -21,7 +21,7 @@ uniform samplerCube cubemap13;
 uniform samplerCube cubemap14;
 uniform samplerCube cubemap15;
 
-float circle = 5.0f;
+uniform float cycle_time_sec;
 
 float mode(float t, int m)
 {
@@ -30,9 +30,7 @@ float mode(float t, int m)
      
 void main(void)
 {   
-   //vec3 npos = normalize(pos);
-   //fragcolor = mix(color2, color1, npos.y+1.0);
-   float t = mode(time_sec, int(circle)) / circle * 15.0f;
+   float t = mode(time_sec, int(cycle_time_sec)) / cycle_time_sec * 15.0f;
 
    if(t < 1.0f)
    {

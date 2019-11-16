@@ -4,6 +4,7 @@ in vec3 FragPos;
 in vec3 Normal;  
 in vec2 TexCoords;
 in float Type;
+in vec4 FragPosLightSpace;
 
 out vec4 FragColor;
 
@@ -19,6 +20,8 @@ uniform sampler2D tree_leaves_tex;
 
 uniform sampler2D water_still_tex;
 
+uniform sampler2D shadowMap;
+
 const int GRASS = 0;
 const int TREE = 1;
 const int LEAF = 2;
@@ -28,7 +31,7 @@ const float threshold = 0.1f;
 vec3 lightColor = vec3(1.0f ,1.0f, 1.0f);
 vec3 lightDir = vec3(1.0f ,1.0f, 1.0f);
 
-float circle = 5.0f;
+uniform float cycle_time_sec;
 
 float mode(float t, int m)
 {
@@ -39,6 +42,7 @@ vec4 renderGrassCube()
 {
 	if(dot(Normal, vec3(0.0, 1.0, 0.0)) > 0.5f)
 	{
+		//return texture(shadowMap, TexCoords);
 		return vec4(0.4f, 1.5 * texture(grass_top_tex, TexCoords).g, 0.4f, 1.0f);
 	}
 	else if(dot(Normal, vec3(0.0, 1.0, 0.0)) < -0.5f)
@@ -76,6 +80,32 @@ vec4 renderStillWater()
 	return texture(water_still_tex, vec2(TexCoords.x, TexCoords.y / 32 + time_sec / 100)) * vec4(0.0f, 0.8f, 1.0f, 0.5f);
 }
 
+float ShadowCalculation(vec4 fragPosLightSpace, vec3 normal)
+{
+	vec3 projCoords = fragPosLightSpace.xyz / fragPosLightSpace.w;
+	projCoords = projCoords * 0.5 + 0.5;
+	float closestDepth = texture(shadowMap, projCoords.xy).r;
+	float currentDepth = projCoords.z;
+
+	if(projCoords.z > 1.0)
+        return 0.0f;
+
+	float bias = max(0.005 * (1.0 - dot(normal, lightDir)), 0.0005);
+	float shadow = 0.0;
+	vec2 texelSize = 1.0 / textureSize(shadowMap, 0);
+	for(int x = -1; x <= 1; ++x)
+	{
+		for(int y = -1; y <= 1; ++y)
+		{
+			float pcfDepth = texture(shadowMap, projCoords.xy + vec2(x, y) * texelSize).r; 
+			shadow += currentDepth - bias > pcfDepth ? 1.0 : 0.0;        
+		}    
+	}
+	shadow /= 9.0;
+	
+	return shadow;
+}
+
 vec3 sunlight(vec3 objectColor)
 {
 	// ambient
@@ -87,8 +117,9 @@ vec3 sunlight(vec3 objectColor)
     lightDir = normalize(lightDir);
     float diff = max(dot(norm, lightDir), 0.0);
     vec3 diffuse = diff * lightColor;
-            
-    return (ambient + diffuse) * objectColor;
+    
+	float shadow = ShadowCalculation(FragPosLightSpace, norm);
+    return (ambient + (1.0f - shadow) * diffuse) * objectColor;
 }
 
 void main()
@@ -103,7 +134,7 @@ void main()
 	else if(abs(Type - 3.0f) < 0.5f)
 		objColor = renderStillWater();
 
-	float t = mode(time_sec, int(circle)) / circle;
+	float t = mode(time_sec, int(cycle_time_sec)) / cycle_time_sec;
 	float angle = t * 3.1415926f;
 	lightDir = vec3(cos(angle), sin(angle), 0.5f);
 	if(t < threshold)
