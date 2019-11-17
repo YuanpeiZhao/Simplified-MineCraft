@@ -622,6 +622,21 @@ void motion(int x, int y)
 	mouseY = win_h / 2;
 }
 
+void mouse_down(int button, int state, int x, int y) {
+	if (state == 0) {
+		switch (button)
+		{
+		case GLUT_LEFT_BUTTON:
+			DeleteCube(player.GetTargetCube(0));
+			break;
+		case GLUT_RIGHT_BUTTON:
+			AddCube(player.GetTargetCube(1), GRASS_CUBE);
+			break;
+		default:
+			break;
+		}
+	}	
+}
 
 
 void reshape(int w, int h)
@@ -644,6 +659,7 @@ int main(int argc, char** argv)
 	//Register callback functions with glut. 
 	glutDisplayFunc(display);
 	
+	glutMouseFunc(mouse_down);
 	glutTimerFunc(deltaTime, Timer, 1);	
 	glutKeyboardFunc(keyboard);
 	glutKeyboardUpFunc(keyboard_up);

@@ -20,6 +20,7 @@ Player::~Player()
 
 void Player::Update()
 {	
+	GetNearestCube(position);
 	Ground();
 	Collision();
 	position += velocity * DeltaTime;
@@ -51,7 +52,7 @@ void Player::Collision()
 {
 	collider->UpdateCenter(position);
 	collider->bGround = false;
-	for (Cube cube : cubeList) {
+	for (Cube cube : nearCubeList) {
 		if (collider->CollisionDetection(cube, velocity, x)) {
 			//position -= velocity.x * DeltaTime * xAxis;
 			velocity.x = 0;
@@ -86,6 +87,34 @@ glm::vec3 Player::Forward() {
 
 glm::vec3 Player::Right() {
 	return glm::normalize(glm::cross(rotation, Up()));
+}
+
+glm::vec3 Player::GetTargetCube(int type)
+{
+	glm::vec3 pos;
+	float dis = 1000.0f;  
+	for (Cube cube : nearCubeList) {
+		if (glm::dot(cube.position-position, rotation) > 0 && 
+			PointToLine(cube.position, position, Target()) <= 0.7f && 
+			glm::distance(cube.position, position) < dis) {
+			pos = cube.position;
+			dis = glm::distance(cube.position, position);
+		}
+	}
+	if(type == 0)
+		return pos;
+	else if (type == 1) {
+		std::vector<glm::vec3> posList;
+		glm::vec3 a = position - pos;
+		posList.push_back((a.x > 0 ? +1.0f : -1.0f) * xAxis + pos);
+		posList.push_back((a.y > 0 ? +1.0f : -1.0f) * yAxis + pos);
+		posList.push_back((a.z > 0 ? +1.0f : -1.0f) * zAxis + pos);
+		for (glm::vec3 p : posList) {
+			if (PointToLine(p, position, Target()) < 0.7f) {
+				return p;
+			}
+		}
+	}
 }
 
 

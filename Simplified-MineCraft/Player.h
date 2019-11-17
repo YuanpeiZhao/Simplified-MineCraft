@@ -51,6 +51,7 @@ public:
 	glm::vec3 Target();
 	glm::vec3 Forward();
 	glm::vec3 Right();
+	glm::vec3 GetTargetCube(int type);
 
 	void Update();
 	void Move(glm::vec3 dir, float dis);

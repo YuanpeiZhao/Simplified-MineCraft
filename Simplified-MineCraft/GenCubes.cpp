@@ -65,6 +65,7 @@ void init_map()
 	{
 		for (int j = -20; j < 20; j++)
 		{
+			
 			cubeList.push_back(Cube(GRASS_CUBE, glm::vec3(float(i), 0.0f, float(j))));
 		}
 	}
@@ -347,6 +348,19 @@ void redefineCubeVBO()
 
 	glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(surf_verts), surf_verts);
 	glBindVertexArray(0);
+}
+
+void DeleteCube(glm::vec3 pos)
+{		
+	cubeList.erase(std::remove(cubeList.begin(), cubeList.end(), pos), cubeList.end());
+	redefineCubeVBO();
+
+}
+
+void AddCube(glm::vec3 pos, int type)
+{
+	cubeList.push_back(Cube(type, pos));
+	redefineCubeVBO();
 }
 
 void draw_cubes(GLuint vao)

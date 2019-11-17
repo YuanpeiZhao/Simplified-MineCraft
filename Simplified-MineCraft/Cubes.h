@@ -15,8 +15,11 @@ class Cube {
 public:
 	vec3 position;
 	int type;
-
+	int health;
 	Cube(int type, vec3 position);
+
+	bool operator==(const Cube &cube) const;
+	bool operator==(const glm::vec3 &pos) const;
 	
 };
 

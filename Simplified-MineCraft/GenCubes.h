@@ -17,4 +17,7 @@ void init_map();
 void sortTranslucentCubeVBO(std::map<float, glm::vec3> sorted);
 void redefineCubeVBO();
 
+void DeleteCube(glm::vec3 pos);
+void AddCube(glm::vec3 pos, int type);
+
 #endif
