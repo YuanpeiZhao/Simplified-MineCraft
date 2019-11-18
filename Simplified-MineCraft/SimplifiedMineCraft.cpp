@@ -20,6 +20,7 @@
 #include "GenCubes.h"
 #include "Player.h"
 #include "GameManager.h"
+#include "Sound.h"
 
 
 //Texture files and IDs
@@ -522,6 +523,8 @@ void init_shadow_map()
 	glDrawBuffer(GL_NONE);
 	glReadBuffer(GL_NONE);
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+	playBGM();
 }
 
 void initOpenGl()
@@ -535,7 +538,7 @@ void initOpenGl()
 
 	for (int i = 0; i < 15; i++)
 	{
-		skybox_id[i] = LoadCube(skybox_name[i]);
+		//skybox_id[i] = LoadCube(skybox_name[i]);
 	}
 	
 	skybox_shader_program = InitShader(skybox_vs.c_str(), skybox_fs.c_str());
