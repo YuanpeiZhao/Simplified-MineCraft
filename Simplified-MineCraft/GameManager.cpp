@@ -6,7 +6,7 @@ std::vector<Cube> nearCubeList;
 const int deltaTime = 16;
 const float DeltaTime = 0.016f;
 const float cycleTime = 5.0f;
-const int SHADOW_WIDTH = 1024, SHADOW_HEIGHT = 1024;
+const int SHADOW_WIDTH = 2048, SHADOW_HEIGHT = 2048;
 
 void GetNearestCube(glm::vec3 pos)
 {	

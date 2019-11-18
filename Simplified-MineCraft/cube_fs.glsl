@@ -95,7 +95,7 @@ float ShadowCalculation(vec4 fragPosLightSpace, vec3 normal)
 	if(projCoords.z > 1.0)
         return 0.0f;
 
-	float bias = max(0.007 * (1.0 - dot(normal, lightDir)), 0.0007);
+	float bias = max(0.004 * (1.0 - dot(normal, lightDir)), 0.0004);
 	float shadow = 0.0;
 	vec2 texelSize = 1.0 / textureSize(shadowMap, 0);
 	for(int x = -1; x <= 1; ++x)

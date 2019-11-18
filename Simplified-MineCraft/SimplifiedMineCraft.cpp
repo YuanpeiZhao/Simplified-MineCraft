@@ -415,7 +415,7 @@ void idle()
 
 	float t = (time_sec - int(time_sec / int(cycleTime)) * cycleTime) / cycleTime;
 	float angle = t * 3.1415926f;
-	sunlightPos = vec3(cos(angle), sin(angle), 0.5f) * 10.0f;
+	sunlightPos = vec3(cos(angle), sin(angle), 0.5f) * 15.0f;
 
 	glUseProgram(cube_shader_program);
 	int time_loc = glGetUniformLocation(cube_shader_program, "time_sec");
