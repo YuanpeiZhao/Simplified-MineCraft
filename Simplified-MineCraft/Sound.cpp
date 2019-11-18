@@ -8,3 +8,12 @@ void playBGM()
 {
 	SoundEngine->play2D("audio/BGM.mp3", true);
 }
+
+void soundDig()
+{}
+
+void soundStep()
+{}
+
+void soundPut()
+{}

@@ -7,6 +7,7 @@
 #define TREE_CUBE 1
 #define LEAF_CUBE 2
 #define WATER_CUBE 3
+#define SAND_CUBE 4
 
 using namespace glm;
 

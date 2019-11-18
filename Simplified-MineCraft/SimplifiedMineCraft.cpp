@@ -223,50 +223,6 @@ void draw_skybox(const glm::mat4& P, const glm::mat4& V)
 	glDepthMask(GL_TRUE);
 }
 
-void draw_plane(const glm::mat4& P, const glm::mat4& V)
-{
-	glUseProgram(plane_shader_program);
-	glm::mat4 R = glm::rotate(0.0f, glm::vec3(1.0f, 0.0f, 0.0f));
-	glm::mat4 M = R * glm::scale(glm::vec3(1.0f));
-
-	int M_loc = glGetUniformLocation(plane_shader_program, "M");
-	if (M_loc != -1)
-	{
-		glUniformMatrix4fv(M_loc, 1, false, glm::value_ptr(M));
-	}
-
-	int PVM_loc = glGetUniformLocation(plane_shader_program, "PVM");
-	if (PVM_loc != -1)
-	{
-		glm::mat4 PVM = P * V * M;
-		glUniformMatrix4fv(PVM_loc, 1, false, glm::value_ptr(PVM));
-	}
-
-	// grassCube Textures
-	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, dirt_texture_id);
-
-	int dirt_tex_loc = glGetUniformLocation(plane_shader_program, "dirt_tex");
-	if (dirt_tex_loc != -1)
-	{
-		glUniform1i(dirt_tex_loc, 0);
-	}
-
-	glActiveTexture(GL_TEXTURE1);
-	glBindTexture(GL_TEXTURE_2D, depthMap);
-
-	int depthMap_loc = glGetUniformLocation(plane_shader_program, "depthMap");
-	if (depthMap_loc != -1)
-	{
-		glUniform1i(depthMap_loc, 1);
-	}
-
-	glDepthMask(GL_FALSE);
-	glBindVertexArray(plane_vao);
-	draw_plane(plane_vao);
-	glDepthMask(GL_TRUE);
-}
-
 void draw_cubes(const glm::mat4& P, const glm::mat4& V)
 {
 	//glBufferSubData
@@ -375,6 +331,11 @@ void draw_cubes(const glm::mat4& P, const glm::mat4& V)
 		glUniform1i(depthMap_loc, 7);
 	}
 
+	glDepthMask(GL_FALSE);
+	glBindVertexArray(plane_vao);
+	draw_plane(plane_vao);
+	glDepthMask(GL_TRUE);
+
 	glBindVertexArray(cube_vao);
 	draw_cubes(cube_vao);
 
@@ -392,7 +353,7 @@ void drawShadowMap()
 	glClear(GL_DEPTH_BUFFER_BIT);
 
 	GLfloat near_plane = 0.1f, far_plane = 50.0f;
-	glm::mat4 lightProjection = glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f, near_plane, far_plane);
+	glm::mat4 lightProjection = glm::ortho(-20.0f, 20.0f, -20.0f, 20.0f, near_plane, far_plane);
 	glm::mat4 lightView = glm::lookAt(sunlightPos, glm::vec3(0.0f), glm::vec3(1.0));
 	lightSpaceMatrix = lightProjection * lightView;
 
@@ -439,7 +400,6 @@ void display()
 
 	draw_skybox(P, V);
 	drawShadowMap();
-	draw_plane(P, V);
 	draw_cubes(P, V);
 
 	draw_gui();
@@ -523,8 +483,6 @@ void init_shadow_map()
 	glDrawBuffer(GL_NONE);
 	glReadBuffer(GL_NONE);
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
-	playBGM();
 }
 
 void initOpenGl()
@@ -538,7 +496,7 @@ void initOpenGl()
 
 	for (int i = 0; i < 15; i++)
 	{
-		//skybox_id[i] = LoadCube(skybox_name[i]);
+		skybox_id[i] = LoadCube(skybox_name[i]);
 	}
 	
 	skybox_shader_program = InitShader(skybox_vs.c_str(), skybox_fs.c_str());
@@ -567,6 +525,8 @@ void initOpenGl()
 	water_still_texture_id = LoadTexture(water_still_texture_name);
 	
 	SetCursorPos(mouseX, mouseY);
+
+	playBGM();
 }
 
 // glut callbacks need to send keyboard and mouse events to imgui

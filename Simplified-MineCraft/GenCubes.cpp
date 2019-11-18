@@ -2,6 +2,7 @@
 #include <glm/gtc/constants.hpp> //for pi
 #include <iostream>
 #include <map>
+#include <time.h>       /* time */
 #include "GenCubes.h"
 
 float surf_verts[9 * 36 * 3000];
@@ -58,6 +59,39 @@ GLuint my_cube_vbo;
 GLuint my_trans_cube_vao;
 GLuint my_trans_cube_vbo;
 
+void createTree(int height, vec3 basicPos)
+{
+	// branch
+	for (int y = 1; y <= height; y++)
+		cubeList.push_back(Cube(TREE_CUBE, basicPos + glm::vec3(0.0f, y, 0.0f)));
+
+	// leaves
+	int radius = height - 2;
+	for (int y = height - 1; y <= 2 * (height - 1); y++)
+	{
+		int my = 2 * height - 3 - y;
+		for (int x = -radius; x < radius; x++)
+		{
+			for (int z = -radius; z < radius; z++)
+			{
+				if (glm::distance(vec2(x, z), vec2(0.0f, 0.0f)) <= radius)
+				{
+					cubeList.push_back(Cube(LEAF_CUBE, basicPos + glm::vec3(x, y, z)));
+					if (my >= height / 2.0f)
+					{
+						cubeList.push_back(Cube(LEAF_CUBE, basicPos + glm::vec3(x, my, z)));
+					}
+				}
+			}
+		}
+		radius -= 1;
+		radius -= rand() % 2;
+		if (radius <= 0)
+			break;
+	}
+
+}
+
 void init_map()
 {
 
@@ -65,27 +99,34 @@ void init_map()
 	{
 		for (int j = -20; j < 20; j++)
 		{
-			
-			cubeList.push_back(Cube(GRASS_CUBE, glm::vec3(float(i), 0.0f, float(j))));
+			if (glm::distance(vec2(i, j), vec2(-5.0f, 0.0f)) <= 4)
+			{
+				translucentCubeList.push_back(Cube(WATER_CUBE, glm::vec3(float(i), 0.0f, float(j))));
+			}
+			else
+			{
+				cubeList.push_back(Cube(GRASS_CUBE, glm::vec3(float(i), 0.0f, float(j))));
+
+				if (glm::distance(vec2(i, j), vec2(-2.0f, 12.0f)) <= 3 || glm::distance(vec2(i, j), vec2(-2.0f, -12.0f)) <= 5 || glm::distance(vec2(i, j), vec2(-10.0f, 0.0f)) <= 5)
+				{
+					cubeList.push_back(Cube(GRASS_CUBE, glm::vec3(float(i), 1.0f, float(j))));
+				}
+				if (glm::distance(vec2(i, j), vec2(-2.0f, 12.0f)) <= 2 || glm::distance(vec2(i, j), vec2(-2.0f, -12.0f)) <= 4 || glm::distance(vec2(i, j), vec2(-10.0f, 0.0f)) <= 3)
+				{
+					cubeList.push_back(Cube(GRASS_CUBE, glm::vec3(float(i), 2.0f, float(j))));
+				}
+				if (glm::distance(vec2(i, j), vec2(-2.0f, -12.0f)) <= 3)
+				{
+					cubeList.push_back(Cube(GRASS_CUBE, glm::vec3(float(i), 3.0f, float(j))));
+				}
+			}		
 		}
 	}
-	
-	cubeList.push_back(Cube(GRASS_CUBE, glm::vec3(0.0f, 3.0f, 6.0f)));
 
-	cubeList.push_back(Cube(LEAF_CUBE, glm::vec3(0.0f, 1.0f, 0.0f)));
-	cubeList.push_back(Cube(LEAF_CUBE, glm::vec3(0.0f, -1.0f, 0.0f)));
-	cubeList.push_back(Cube(LEAF_CUBE, glm::vec3(1.0f, 1.0f, 0.0f)));
-	cubeList.push_back(Cube(LEAF_CUBE, glm::vec3(1.0f, -1.0f, 0.0f)));
-	cubeList.push_back(Cube(LEAF_CUBE, glm::vec3(-1.0f, 1.0f, 0.0f)));
-	cubeList.push_back(Cube(LEAF_CUBE, glm::vec3(-1.0f, -1.0f, 0.0f)));
-
-	cubeList.push_back(Cube(TREE_CUBE, glm::vec3(0.0f, 1.0f, 2.0f)));
-	cubeList.push_back(Cube(TREE_CUBE, glm::vec3(1.0f, 1.0f, 2.0f)));
-	cubeList.push_back(Cube(TREE_CUBE, glm::vec3(-1.0f, 1.0f, 2.0f)));
-
-	translucentCubeList.push_back(Cube(WATER_CUBE, glm::vec3(0.0f, 2.0f, 1.0f)));
-	translucentCubeList.push_back(Cube(WATER_CUBE, glm::vec3(1.0f, 2.0f, 1.0f)));
-	translucentCubeList.push_back(Cube(WATER_CUBE, glm::vec3(-1.0f, 2.0f, 1.0f)));
+	srand(time(NULL));
+	createTree(5 + rand() % 4, vec3(-2.0f, 3.0f, -12.0f));
+	createTree(5 + rand() % 4, vec3(5.0f, 0.0f, 0.0f));
+	createTree(5 + rand() % 4, vec3(-2.0f, 2.0f, 12.0f));
 }
 
 GLuint create_cube_vbo()
@@ -229,22 +270,13 @@ GLuint create_trans_cube_vao()
 GLuint create_plane_vbo()
 {
 	//Declare a vector to hold N vertices
-	/*float verts[8*6] = {
-	-100.0f, -0.5f, -100.0f,  0.0f,  1.0f,  0.0f,  0.0f,  0.0f,
-	 100.0f, -0.5f,  100.0f,  0.0f,  1.0f,  0.0f,  200.0f,  200.0f,
-	-100.0f, -0.5f,  100.0f,  0.0f,  1.0f,  0.0f,  0.0f,  200.0f,
-	-100.0f, -0.5f, -100.0f,  0.0f,  1.0f,  0.0f,  0.0f,  0.0f,
-	 100.0f, -0.5f, -100.0f,  0.0f,  1.0f,  0.0f,  200.0f,  0.0f,
-	 100.0f, -0.5f,  100.0f,  0.0f,  1.0f,  0.0f,  200.0f,  200.0f
-	};*/
-
-	float verts[8 * 6] = {
-	-10.0f, -10.0f,  30.0f, 0.0f,  1.0f,  0.0f,  0.0f,  0.0f,
-	 10.0f, 10.0f,  30.0f,  0.0f,  1.0f,  0.0f,  1.0f,  1.0f,
-	-10.0f, 10.0f,  30.0f,  0.0f,  1.0f,  0.0f,  0.0f,  1.0f,
-	-10.0f, -10.0f,  30.0f,  0.0f,  1.0f,  0.0f,  0.0f,  0.0f,
-	 10.0f, -10.0f,  30.0f,  0.0f,  1.0f,  0.0f,  1.0f,  0.0f,
-	 10.0f, 10.0f,  30.0f,  0.0f,  1.0f,  0.0f,  1.0f,  1.0f
+	float verts[9*6] = {
+	-20.0f, -0.5f, -20.0f,  0.0f,  1.0f,  0.0f,  0.0f,  0.0f, SAND_CUBE,
+	 20.0f, -0.5f,  20.0f,  0.0f,  1.0f,  0.0f,  40.0f,  40.0f, SAND_CUBE,
+	-20.0f, -0.5f,  20.0f,  0.0f,  1.0f,  0.0f,  0.0f,  40.0f, SAND_CUBE,
+	-20.0f, -0.5f, -20.0f,  0.0f,  1.0f,  0.0f,  0.0f,  0.0f, SAND_CUBE,
+	 20.0f, -0.5f, -20.0f,  0.0f,  1.0f,  0.0f,  40.0f,  0.0f, SAND_CUBE,
+	 20.0f, -0.5f,  20.0f,  0.0f,  1.0f,  0.0f,  40.0f,  40.0f, SAND_CUBE
 	};
 
 	GLuint vbo;
@@ -275,12 +307,14 @@ GLuint create_plane_vao()
 	glEnableVertexAttribArray(pos_loc); //Enable the position attribute.
 
 	//Tell opengl how to get the attribute values out of the vbo (stride and offset).
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 9 * sizeof(float), (void*)0);
 	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 9 * sizeof(float), (void*)(3 * sizeof(float)));
 	glEnableVertexAttribArray(1);
-	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
+	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 9 * sizeof(float), (void*)(6 * sizeof(float)));
 	glEnableVertexAttribArray(2);
+	glVertexAttribPointer(3, 1, GL_FLOAT, GL_FALSE, 9 * sizeof(float), (void*)(8 * sizeof(float)));
+	glEnableVertexAttribArray(3);
 
 	glBindVertexArray(0); //unbind the vao
 

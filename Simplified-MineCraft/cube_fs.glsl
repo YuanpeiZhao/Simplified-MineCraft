@@ -80,6 +80,11 @@ vec4 renderStillWater()
 	return texture(water_still_tex, vec2(TexCoords.x, TexCoords.y / 32 + time_sec / 100)) * vec4(0.0f, 0.8f, 1.0f, 0.5f);
 }
 
+vec4 renderSandPlane()
+{
+	return texture(dirt_tex, TexCoords);
+}
+
 float ShadowCalculation(vec4 fragPosLightSpace, vec3 normal)
 {
 	vec3 projCoords = fragPosLightSpace.xyz / fragPosLightSpace.w;
@@ -90,7 +95,7 @@ float ShadowCalculation(vec4 fragPosLightSpace, vec3 normal)
 	if(projCoords.z > 1.0)
         return 0.0f;
 
-	float bias = max(0.005 * (1.0 - dot(normal, lightDir)), 0.0005);
+	float bias = max(0.007 * (1.0 - dot(normal, lightDir)), 0.0007);
 	float shadow = 0.0;
 	vec2 texelSize = 1.0 / textureSize(shadowMap, 0);
 	for(int x = -1; x <= 1; ++x)
@@ -133,6 +138,8 @@ void main()
 		objColor = renderLeafCube();
 	else if(abs(Type - 3.0f) < 0.5f)
 		objColor = renderStillWater();
+	else if(abs(Type - 4.0f) < 0.5f)
+		objColor = renderSandPlane();
 
 	float t = mode(time_sec, int(cycle_time_sec)) / cycle_time_sec;
 	float angle = t * 3.1415926f;
