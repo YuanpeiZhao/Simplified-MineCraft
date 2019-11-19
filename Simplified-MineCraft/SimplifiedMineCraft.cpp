@@ -85,6 +85,8 @@ float mouseX = win_w / 2, mouseY = win_h / 2;
 float verAxis = 0.0f, horAxis = 0.0f;
 Player player(glm::vec3(0.0f, 15.0f, 0.0f), glm::vec3(0.0f, 0.0f, -1.0f));
 
+void reshape(int w, int h);
+
 void draw_gui()
 {
 	ImGui_ImplGlut_NewFrame();
@@ -392,6 +394,9 @@ void drawShadowMap()
 // This function gets called every time the scene gets redisplayed 
 void display()
 {
+	//ShowCursor(false);
+	//reshape(glutGet(GLUT_SCREEN_WIDTH), glutGet(GLUT_SCREEN_HEIGHT));
+
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); //Clear the back buffer
 
 	//glm::mat4 V = glm::lookAt(campos, glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f)) * glm::rotate(camangle, glm::vec3(0.0f, 1.0f, 0.0f));
@@ -527,6 +532,8 @@ void initOpenGl()
 	SetCursorPos(mouseX, mouseY);
 
 	playBGM();
+
+	//glutFullScreen();
 }
 
 // glut callbacks need to send keyboard and mouse events to imgui
@@ -601,12 +608,12 @@ void mouse_down(int button, int state, int x, int y) {
 	}	
 }
 
-
 void reshape(int w, int h)
 {
 	glViewport(0, 0, w, h);
 	aspect = (float)w / h;
 }
+
 
 int main(int argc, char** argv)
 {
@@ -615,6 +622,7 @@ int main(int argc, char** argv)
 	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA | GLUT_DEPTH);
 	glutInitWindowPosition(0, 0);
 	glutInitWindowSize(win_w, win_h);
+	
 	int win = glutCreateWindow("Simplified MineCraft");
 	
 	printGlInfo();
