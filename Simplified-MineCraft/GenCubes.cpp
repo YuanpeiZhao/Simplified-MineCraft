@@ -320,6 +320,45 @@ GLuint create_plane_vao()
 
 	return vao;
 }
+GLuint create_hand_vbo() {
+	float vertices[8 * 3] = {
+		0.2f, 0.2f, -0.5f,
+		0.2f, -0.2f, -0.5f,
+		-0.2f, 0.2f, -0.5f,
+		-0.2f, -0.2f, -0.5f,
+		0.2f, 0.2f, 0.5f,
+		0.2f, -0.2f, 0.5f,
+		-0.2f, 0.2f, 0.5f,
+		-0.2f, -0.2f, 0.5f,
+
+	};
+
+	GLuint vbo;
+	glGenBuffers(1, &vbo);
+	glBindBuffer(GL_ARRAY_BUFFER, vbo);
+
+	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_DYNAMIC_DRAW);
+
+	return vbo;
+}
+
+GLuint create_hand_vao()
+{
+	GLuint vao;
+	glGenVertexArrays(1, &vao);
+	glBindVertexArray(vao);
+
+	GLuint vbo = create_hand_vbo();
+
+	const GLint pos_loc = 0;
+	glEnableVertexAttribArray(pos_loc);
+
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
+	glEnableVertexAttribArray(0);
+
+	glBindVertexArray(0);
+	return vao;
+}
 
 void sortTranslucentCubeVBO(std::map<float, glm::vec3> sorted)
 {
@@ -395,6 +434,12 @@ void AddCube(glm::vec3 pos, int type)
 {
 	cubeList.push_back(Cube(type, pos));
 	redefineCubeVBO();
+}
+
+void draw_hand(GLuint vao)
+{
+	
+	glDrawArrays(GL_TRIANGLES, 0, 8);
 }
 
 void draw_cubes(GLuint vao)

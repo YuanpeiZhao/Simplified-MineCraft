@@ -104,6 +104,9 @@
     <ClInclude Include="Sound.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="resource.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="cube_fs.glsl">
@@ -128,6 +131,12 @@
       <Filter>资源文件</Filter>
     </None>
     <None Include="shadow_vs.glsl">
+      <Filter>资源文件</Filter>
+    </None>
+    <None Include="hand_vs.glsl">
+      <Filter>资源文件</Filter>
+    </None>
+    <None Include="hand_fs.glsl">
       <Filter>资源文件</Filter>
     </None>
   </ItemGroup>
