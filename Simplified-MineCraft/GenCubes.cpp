@@ -321,17 +321,11 @@ GLuint create_plane_vao()
 	return vao;
 }
 GLuint create_hand_vbo() {
-	float vertices[8 * 3] = {
-		0.2f, 0.2f, -0.5f,
-		0.2f, -0.2f, -0.5f,
-		-0.2f, 0.2f, -0.5f,
-		-0.2f, -0.2f, -0.5f,
-		0.2f, 0.2f, 0.5f,
-		0.2f, -0.2f, 0.5f,
-		-0.2f, 0.2f, 0.5f,
-		-0.2f, -0.2f, 0.5f,
-
-	};
+	float vertices[36 * 3];
+	for(int i = 0; i < 36; i++)
+		for (int j = 0; j < 3; j++) {
+			vertices[3 * i + j] = basic[8 * i + j];
+		}
 
 	GLuint vbo;
 	glGenBuffers(1, &vbo);
@@ -439,7 +433,7 @@ void AddCube(glm::vec3 pos, int type)
 void draw_hand(GLuint vao)
 {
 	
-	glDrawArrays(GL_TRIANGLES, 0, 8);
+	glDrawArrays(GL_TRIANGLES, 0, 36);
 }
 
 void draw_cubes(GLuint vao)

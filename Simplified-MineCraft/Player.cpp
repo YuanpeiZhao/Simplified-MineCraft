@@ -135,7 +135,8 @@ void Player::OnMouseMove(int x, int y)
 	/*float Y = glm::radians(yaw);
 	float P = glm::radians(pitch);
 	rotation = glm::vec3(-sin(Y)*cos(P), sin(P), -cos(P) * cos(Y));*/
-	glm::vec4 t =  glm::rotate(yaw, yAxis)* glm::rotate( pitch, xAxis) * glm::vec4(0.0f, 0.0f, -1.0f, 0.0f)  ;
+	glm::mat4 R = glm::rotate(yaw, yAxis)* glm::rotate(pitch, xAxis);
+	glm::vec4 t =  R * glm::vec4(0.0f, 0.0f, -1.0f, 0.0f)  ;
 	rotation = glm::vec3(t);
 }
 

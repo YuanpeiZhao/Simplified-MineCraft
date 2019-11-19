@@ -248,7 +248,10 @@ void draw_skybox(const glm::mat4& P, const glm::mat4& V)
 }
 
 void draw_hands(const glm::mat4& P, const glm::mat4& V) {
-	glm::mat4 M = glm::translate(glm::vec3(0.0f, 5.0f, 0.0f)) * glm::rotate(0.0f, glm::vec3(0.0f, 1.0f, 0.0f)) * glm::scale(glm::vec3(1.0f));
+	glm::mat4 S = glm::scale(glm::vec3(0.1f, 0.1f, 0.8f));
+	glm::mat4 R = glm::rotate(player.yaw, yAxis)* glm::rotate(player.pitch, xAxis);
+	glm::mat4 T = glm::translate(player.position);
+	glm::mat4 M = T * R * glm::translate(glm::vec3(0.15f, -0.15f, 0.0f)) * S;
 
 	glUseProgram(hand_shader_program);
 	int PVM_loc = glGetUniformLocation(hand_shader_program, "PVM");
@@ -440,7 +443,7 @@ void display()
 	draw_skybox(P, V);
 	drawShadowMap();
 	draw_cubes(P, V);
-	//draw_hands(P, V);
+	draw_hands(P, V);
 
 	draw_gui();
 	glutSwapBuffers();
