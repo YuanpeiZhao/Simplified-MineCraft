@@ -70,6 +70,12 @@ static const std::string skybox_fs("skybox_fs.glsl");
 GLuint skybox_shader_program = -1;
 GLuint skybox_vao = -1;
 
+//Hand files and IDs
+static const std::string hand_vs("hand_vs.glsl");
+static const std::string hand_fs("hand_fs.glsl");
+GLuint hand_shader_program = -1;
+GLuint hand_vao = -1;
+
 //Shadow files and IDs
 static const std::string shadow_vs("shadow_vs.glsl");
 static const std::string shadow_fs("shadow_fs.glsl");
@@ -84,14 +90,30 @@ float win_w = 640.0f, win_h = 640.0f;
 float mouseX = win_w / 2, mouseY = win_h / 2;
 float verAxis = 0.0f, horAxis = 0.0f;
 Player player(glm::vec3(0.0f, 15.0f, 0.0f), glm::vec3(0.0f, 0.0f, -1.0f));
+int cubeType = 0;
 
 void draw_gui()
 {
 	ImGui_ImplGlut_NewFrame();
 
-	ImGui::Begin("Tool Bar", nullptr, ImGuiWindowFlags_AlwaysAutoResize);
+	ImGui::Begin("Menu", nullptr, ImGuiWindowFlags_AlwaysAutoResize);
 
-	ImGui::SliderFloat3("Cam Pos", &campos[0], -5.0f, 5.0f);
+	//ImGui::SliderFloat3("Cam Pos", &campos[0], -5.0f, 5.0f);
+	switch (cubeType) {
+	case 0:
+		ImGui::Text("CubeType: Grass");
+		break;
+	case 1:
+		ImGui::Text("CubeType: Tree");
+		break;
+	case 2:
+		ImGui::Text("CubeType: Leaf");
+		break;
+	default:
+		ImGui::Text("CubeType: Grass");
+		break;
+	}
+	
 
 	ImGui::End();
 
@@ -221,6 +243,18 @@ void draw_skybox(const glm::mat4& P, const glm::mat4& V)
 	glBindVertexArray(skybox_vao);
 	draw_skybox(skybox_vao);
 	glDepthMask(GL_TRUE);
+}
+
+void draw_hands(const glm::mat4& P, const glm::mat4& V) {
+	glm::mat4 M = glm::translate(glm::vec3(0.0f, 5.0f, 0.0f)) * glm::rotate(0.0f, glm::vec3(0.0f, 1.0f, 0.0f)) * glm::scale(glm::vec3(1.0f));
+
+	glUseProgram(hand_shader_program);
+	int PVM_loc = glGetUniformLocation(hand_shader_program, "PVM");
+	if (PVM_loc != -1) {
+		glUniformMatrix4fv(PVM_loc, 1, false, glm::value_ptr(P*V*M));
+	}
+	glBindVertexArray(hand_vao);
+	draw_hand(hand_vao);
 }
 
 void draw_cubes(const glm::mat4& P, const glm::mat4& V)
@@ -401,6 +435,7 @@ void display()
 	draw_skybox(P, V);
 	drawShadowMap();
 	draw_cubes(P, V);
+	//draw_hands(P, V);
 
 	draw_gui();
 	glutSwapBuffers();
@@ -503,6 +538,7 @@ void initOpenGl()
 	cube_shader_program = InitShader(cube_vs.c_str(), cube_fs.c_str());
 	plane_shader_program = InitShader(plane_vs.c_str(), plane_fs.c_str());
 	shadow_shader_program = InitShader(shadow_vs.c_str(), shadow_fs.c_str());
+	hand_shader_program = InitShader(hand_vs.c_str(), hand_fs.c_str());
 
 	init_map();
 	init_shadow_map();
@@ -511,6 +547,7 @@ void initOpenGl()
 	cube_vao = create_cube_vao();
 	trans_cube_vao = create_trans_cube_vao();
 	plane_vao = create_plane_vao();
+	hand_vao = create_hand_vao();
 
 	ImGui_ImplGlut_Init(); // initialize the imgui system
 
@@ -549,6 +586,15 @@ void keyboard(unsigned char key, int x, int y)
 	case 32:
 		player.Jump();
 		break;
+	case '1':
+		cubeType = GRASS_CUBE;
+		break;
+	case '2':
+		cubeType = TREE_CUBE;
+		break;
+	case '3':
+		cubeType = LEAF_CUBE;
+		break;
 	default:
 		break;
 	}
@@ -585,7 +631,7 @@ void motion(int x, int y)
 	mouseY = win_h / 2;
 }
 
-void mouse_down(int button, int state, int x, int y) {
+void mouse(int button, int state, int x, int y) {
 	if (state == 0) {
 		switch (button)
 		{
@@ -593,7 +639,7 @@ void mouse_down(int button, int state, int x, int y) {
 			DeleteCube(player.GetTargetCube(0));
 			break;
 		case GLUT_RIGHT_BUTTON:
-			AddCube(player.GetTargetCube(1), GRASS_CUBE);
+			AddCube(player.GetTargetCube(1), cubeType);
 			break;
 		default:
 			break;
@@ -622,7 +668,7 @@ int main(int argc, char** argv)
 	//Register callback functions with glut. 
 	glutDisplayFunc(display);
 	
-	glutMouseFunc(mouse_down);
+	glutMouseFunc(mouse);
 	glutTimerFunc(deltaTime, Timer, 1);	
 	glutKeyboardFunc(keyboard);
 	glutKeyboardUpFunc(keyboard_up);
