@@ -30,6 +30,27 @@ public:
 	bool CollisionDetection(Cube cube, glm::vec3 velocity, Dir dir);
 };
 
+class Hand {
+public:
+	Hand();
+	~Hand();
+
+	glm::mat4 R;
+	glm::mat4 T;
+	glm::mat4 S;
+	glm::mat4 M;
+
+	float angle;
+	bool anim_trigger = false;
+	struct Animation {
+		float Angle[30];
+		int index;
+	}anim;
+
+	void Update(glm::vec3 pos, float pitch, float yaw);
+	void PlayAnim();
+};
+
 class Player
 {
 public:
@@ -62,5 +83,6 @@ public:
 	void OnMouseMove(int x, int y);
 	
 	Collider* collider;
+	Hand hand;
 };
 

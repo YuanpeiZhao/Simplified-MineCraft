@@ -248,15 +248,12 @@ void draw_skybox(const glm::mat4& P, const glm::mat4& V)
 }
 
 void draw_hands(const glm::mat4& P, const glm::mat4& V) {
-	glm::mat4 S = glm::scale(glm::vec3(0.1f, 0.1f, 0.8f));
-	glm::mat4 R = glm::rotate(player.yaw, yAxis)* glm::rotate(player.pitch, xAxis);
-	glm::mat4 T = glm::translate(player.position);
-	glm::mat4 M = T * R * glm::translate(glm::vec3(0.15f, -0.15f, 0.0f)) * S;
-
+	
+	player.hand.Update(player.position, player.pitch, player.yaw);
 	glUseProgram(hand_shader_program);
 	int PVM_loc = glGetUniformLocation(hand_shader_program, "PVM");
 	if (PVM_loc != -1) {
-		glUniformMatrix4fv(PVM_loc, 1, false, glm::value_ptr(P*V*M));
+		glUniformMatrix4fv(PVM_loc, 1, false, glm::value_ptr(P*V*player.hand.M));
 	}
 	glBindVertexArray(hand_vao);
 	draw_hand(hand_vao);
@@ -459,7 +456,7 @@ void idle()
 	float t = (time_sec - int(time_sec / int(cycleTime)) * cycleTime) / cycleTime;
 	float angle = t * 3.1415926f;
 	sunlightPos = vec3(cos(angle), sin(angle), 0.5f) * 15.0f;
-
+	
 	glUseProgram(cube_shader_program);
 	int time_loc = glGetUniformLocation(cube_shader_program, "time_sec");
 	if (time_loc != -1)
@@ -646,9 +643,11 @@ void mouse(int button, int state, int x, int y) {
 		switch (button)
 		{
 		case GLUT_LEFT_BUTTON:
+			player.hand.anim_trigger = true;
 			DeleteCube(player.GetTargetCube(0));
 			break;
 		case GLUT_RIGHT_BUTTON:
+			player.hand.anim_trigger = true;
 			AddCube(player.GetTargetCube(1), cubeType);
 			break;
 		default:
