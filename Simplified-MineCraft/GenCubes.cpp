@@ -103,9 +103,17 @@ void init_map()
 			{
 				translucentCubeList.push_back(Cube(WATER_CUBE, glm::vec3(float(i), 0.0f, float(j))));
 			}
+
 			else
 			{
-				cubeList.push_back(Cube(GRASS_CUBE, glm::vec3(float(i), 0.0f, float(j))));
+				if (i >= 1 && i <= 3)
+				{
+					cubeList.push_back(Cube(BRICK_CUBE, glm::vec3(float(i), 0.0f, float(j))));
+				}
+				else
+				{
+					cubeList.push_back(Cube(GRASS_CUBE, glm::vec3(float(i), 0.0f, float(j))));
+				}
 
 				if (glm::distance(vec2(i, j), vec2(-2.0f, 12.0f)) <= 3 || glm::distance(vec2(i, j), vec2(-2.0f, -12.0f)) <= 5 || glm::distance(vec2(i, j), vec2(-10.0f, 0.0f)) <= 5)
 				{
@@ -123,9 +131,23 @@ void init_map()
 		}
 	}
 
+	cubeList.push_back(Cube(BRICK_CUBE, glm::vec3(0.0f, 1.0f, 0.0f)));
+	cubeList.push_back(Cube(BRICK_CUBE, glm::vec3(0.0f, 1.0f, 4.0f)));
+	cubeList.push_back(Cube(BRICK_CUBE, glm::vec3(0.0f, 1.0f, -4.0f)));
+	cubeList.push_back(Cube(BRICK_CUBE, glm::vec3(4.0f, 1.0f, 0.0f)));
+	cubeList.push_back(Cube(BRICK_CUBE, glm::vec3(4.0f, 1.0f, 4.0f)));
+	cubeList.push_back(Cube(BRICK_CUBE, glm::vec3(4.0f, 1.0f, -4.0f)));
+
+	translucentCubeList.push_back(Cube(LIGHT_CUBE, glm::vec3(0.0f, 2.0f, 0.0f)));
+	translucentCubeList.push_back(Cube(LIGHT_CUBE, glm::vec3(0.0f, 2.0f, 4.0f)));
+	translucentCubeList.push_back(Cube(LIGHT_CUBE, glm::vec3(0.0f, 2.0f, -4.0f)));
+	translucentCubeList.push_back(Cube(LIGHT_CUBE, glm::vec3(4.0f, 2.0f, 0.0f)));
+	translucentCubeList.push_back(Cube(LIGHT_CUBE, glm::vec3(4.0f, 2.0f, 4.0f)));
+	translucentCubeList.push_back(Cube(LIGHT_CUBE, glm::vec3(4.0f, 2.0f, -4.0f)));
+
 	srand(time(NULL));
 	createTree(5 + rand() % 4, vec3(-2.0f, 3.0f, -12.0f));
-	createTree(5 + rand() % 4, vec3(5.0f, 0.0f, 0.0f));
+	createTree(5 + rand() % 4, vec3(7.0f, 0.0f, 0.0f));
 	createTree(5 + rand() % 4, vec3(-2.0f, 2.0f, 12.0f));
 }
 

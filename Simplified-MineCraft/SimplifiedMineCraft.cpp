@@ -41,6 +41,9 @@ GLuint tree_leaves_texture_id = -1;
 static const std::string water_still_texture_name = "textures/waterBlock/water_still.png";
 GLuint water_still_texture_id = -1;
 
+static const std::string brick_texture_name = "textures/brickBlock/bricks.png";
+GLuint brick_texture_id = -1;
+
 //Light and Shadow
 vec3 sunlightPos = vec3(0.0f, 0.0f, 0.0f);
 GLuint depthMap;
@@ -367,6 +370,15 @@ void draw_cubes(const glm::mat4& P, const glm::mat4& V)
 		glUniform1i(depthMap_loc, 7);
 	}
 
+	glActiveTexture(GL_TEXTURE8);
+	glBindTexture(GL_TEXTURE_2D, brick_texture_id);
+
+	int brickMap_loc = glGetUniformLocation(cube_shader_program, "brick_tex");
+	if (brickMap_loc != -1)
+	{
+		glUniform1i(brickMap_loc, 8);
+	}
+
 	glDepthMask(GL_FALSE);
 	glBindVertexArray(plane_vao);
 	draw_plane(plane_vao);
@@ -565,6 +577,7 @@ void initOpenGl()
 	tree_leaves_texture_id = LoadTexture(tree_leaves_texture_name);
 
 	water_still_texture_id = LoadTexture(water_still_texture_name);
+	brick_texture_id = LoadTexture(brick_texture_name);
 	
 	SetCursorPos(mouseX, mouseY);
 

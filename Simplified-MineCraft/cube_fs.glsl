@@ -19,12 +19,17 @@ uniform sampler2D tree_log_top_tex;
 uniform sampler2D tree_leaves_tex;
 
 uniform sampler2D water_still_tex;
+uniform sampler2D brick_tex;
 
 uniform sampler2D shadowMap;
 
-const int GRASS = 0;
-const int TREE = 1;
-const int LEAF = 2;
+const float GRASS = 0.0f;
+const float TREE = 1.0f;
+const float LEAF = 2.0f;
+const float WATER = 3.0f;
+const float SAND = 4.0f;
+const float BRICK = 5.0f;
+const float LIGHT = 6.0f;
 
 const float threshold = 0.1f;
 
@@ -85,6 +90,16 @@ vec4 renderSandPlane()
 	return texture(dirt_tex, TexCoords);
 }
 
+vec4 renderBrick()
+{
+	return texture(brick_tex, TexCoords);
+}
+
+vec4 renderLight()
+{
+	return vec4(1.0f, 1.0f, 0.7f, 1.0f);
+}
+
 float ShadowCalculation(vec4 fragPosLightSpace, vec3 normal)
 {
 	vec3 projCoords = fragPosLightSpace.xyz / fragPosLightSpace.w;
@@ -114,7 +129,7 @@ float ShadowCalculation(vec4 fragPosLightSpace, vec3 normal)
 vec3 sunlight(vec3 objectColor)
 {
 	// ambient
-    float ambientStrength = 0.2;
+    float ambientStrength = 0.1;
     vec3 ambient = vec3(ambientStrength);
   	
     // diffuse 
@@ -127,29 +142,65 @@ vec3 sunlight(vec3 objectColor)
     return (ambient + (1.0f - shadow) * diffuse) * objectColor;
 }
 
+vec3 CalcPointLight(vec3 lightPos)
+{
+    vec3 pointLightDir = normalize(lightPos - FragPos);
+    float diff = max(dot(Normal, pointLightDir), 0.0);
+
+    float dis = length(lightPos - FragPos);
+    float attenuation = 1.0 / (0.0f + 0.0f * dis + 
+                 1.0f * (dis * dis));    
+
+    vec3 ambient  = vec3(1.0f, 1.0f, 0.7f)  * 0.4f;
+    vec3 diffuse  = vec3(1.0f, 1.0f, 0.7f)  * diff * 0.2f;
+
+    ambient  *= attenuation;
+    diffuse  *= attenuation;
+
+    return (ambient + diffuse);
+}
+
 void main()
 {
 	vec4 objColor;
-	if(abs(Type - 0.0f) < 0.5f)
+	if(abs(Type - GRASS) < 0.5f)
 		objColor = renderGrassCube();
-	else if(abs(Type - 1.0f) < 0.5f)
+	else if(abs(Type - TREE) < 0.5f)
 		objColor = renderLogCube();
-	else if(abs(Type - 2.0f) < 0.5f)
+	else if(abs(Type - LEAF) < 0.5f)
 		objColor = renderLeafCube();
-	else if(abs(Type - 3.0f) < 0.5f)
+	else if(abs(Type - WATER) < 0.5f)
 		objColor = renderStillWater();
-	else if(abs(Type - 4.0f) < 0.5f)
+	else if(abs(Type - SAND) < 0.5f)
 		objColor = renderSandPlane();
+	else if(abs(Type - BRICK) < 0.5f)
+		objColor = renderBrick();
+	else if(abs(Type - LIGHT) < 0.5f)
+		objColor = renderLight();
 
-	float t = mode(time_sec, int(cycle_time_sec)) / cycle_time_sec;
-	float angle = t * 3.1415926f;
-	lightDir = vec3(cos(angle), sin(angle), 0.5f);
-	if(t < threshold)
-		lightColor = vec3(1.0f / threshold * t);
-	if(t > 1.0f - threshold)
-		lightColor = vec3(1.0f / threshold * (1.0f -t));
+	if(abs(Type - LIGHT) < 0.5f)
+	{
+		FragColor = objColor;
+	}
+	else
+	{
+		float t = mode(time_sec, int(cycle_time_sec)) / cycle_time_sec;
+		float angle = t * 3.1415926f;
+		lightDir = vec3(cos(angle), sin(angle), 0.5f);
+		if(t < threshold)
+			lightColor = vec3(1.0f / threshold * t);
+		if(t > 1.0f - threshold)
+			lightColor = vec3(1.0f / threshold * (1.0f -t));
 
-	FragColor = vec4(sunlight(objColor.xyz), objColor.w);
+		FragColor = vec4(sunlight(objColor.xyz), objColor.w);
+
+		FragColor += vec4(CalcPointLight(vec3(0.0f, 2.0f, 4.0f)), 0.0f);
+		FragColor += vec4(CalcPointLight(vec3(0.0f, 2.0f, 0.0f)), 0.0f);
+		FragColor += vec4(CalcPointLight(vec3(0.0f, 2.0f, -4.0f)), 0.0f);
+		FragColor += vec4(CalcPointLight(vec3(4.0f, 2.0f, 0.0f)), 0.0f);
+		FragColor += vec4(CalcPointLight(vec3(4.0f, 2.0f, 4.0f)), 0.0f);
+		FragColor += vec4(CalcPointLight(vec3(4.0f, 2.0f, -4.0f)), 0.0f);
+	}
 } 
 
 

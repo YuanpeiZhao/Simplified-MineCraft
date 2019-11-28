@@ -8,6 +8,8 @@
 #define LEAF_CUBE 2
 #define WATER_CUBE 3
 #define SAND_CUBE 4
+#define BRICK_CUBE 5
+#define LIGHT_CUBE 6
 
 using namespace glm;
 
