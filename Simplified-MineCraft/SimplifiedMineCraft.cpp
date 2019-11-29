@@ -449,6 +449,9 @@ void display()
 	glm::mat4 V = glm::lookAt(player.position, player.Target(), glm::vec3(0.0f, 1.0f, 0.0f));
 	glm::mat4 P = glm::perspective(80.0f, aspect, 0.1f, 100.0f); //not affine
 
+	setWaterFlowPos(V * glm::vec4(0.0f, 0.0f, 5.0f, 1.0f));
+	setBirdPos(V * glm::vec4(5.0f, 0.0f, 0.0f, 1.0f));
+
 	draw_skybox(P, V);
 	drawShadowMap();
 	draw_cubes(P, V);
@@ -582,6 +585,8 @@ void initOpenGl()
 	SetCursorPos(mouseX, mouseY);
 
 	playBGM();
+	playWaterFlow();
+	playBird();
 
 	//glutFullScreen();
 }

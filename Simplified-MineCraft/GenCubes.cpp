@@ -4,6 +4,7 @@
 #include <map>
 #include <time.h>       /* time */
 #include "GenCubes.h"
+#include "Sound.h"
 
 float surf_verts[9 * 36 * 3000];
 float trans_surf_verts[9 * 36 * 200];
@@ -441,13 +442,14 @@ void redefineCubeVBO()
 
 void DeleteCube(glm::vec3 pos)
 {		
+	soundDig();
 	cubeList.erase(std::remove(cubeList.begin(), cubeList.end(), pos), cubeList.end());
 	redefineCubeVBO();
-
 }
 
 void AddCube(glm::vec3 pos, int type)
 {
+	soundPut();
 	cubeList.push_back(Cube(type, pos));
 	redefineCubeVBO();
 }
