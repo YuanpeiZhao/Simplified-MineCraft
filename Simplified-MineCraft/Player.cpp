@@ -92,7 +92,7 @@ glm::vec3 Player::Right() {
 
 glm::vec3 Player::GetTargetCube(int type)
 {
-	glm::vec3 pos;
+	glm::vec3 pos = null;
 	float dis = 1000.0f;  
 	for (Cube cube : nearCubeList) {
 		if (glm::dot(cube.position-position, rotation) > 0 && 
@@ -102,6 +102,8 @@ glm::vec3 Player::GetTargetCube(int type)
 			dis = glm::distance(cube.position, position);
 		}
 	}
+	if (pos == null)
+		return null;
 	if(type == 0)
 		return pos;
 	else if (type == 1) {
@@ -197,10 +199,11 @@ Hand::Hand()
 	R = glm::rotate(0.0f, yAxis)* glm::rotate(0.0f + angle, xAxis);
 	T = glm::translate(glm::vec3(0.0f));
 	M = T * R * glm::translate(glm::vec3(0.15f, -0.15f, 0.0f)) * S;
-	for (int i = 0; i < 30; i++) {
-		anim.Angle[i] = i * 2;
+	anim.count = 10;
+	for (int i = 0; i < anim.count; i++) {
+		anim.Angle[i] = i * 6;
 	}
-	anim.index = 29;
+	anim.index = anim.count - 1;
 }
 
 Hand::~Hand()
@@ -219,7 +222,7 @@ void Hand::PlayAnim()
 	if (anim_trigger) {				
 		angle = anim.Angle[anim.index--];
 		if (anim.index == 0) {
-			anim.index = 29;
+			anim.index = anim.count - 1;
 			anim_trigger = false;			
 		}
 	}

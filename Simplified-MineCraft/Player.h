@@ -43,7 +43,8 @@ public:
 	float angle;
 	bool anim_trigger = false;
 	struct Animation {
-		float Angle[30];
+	 int count;
+		float Angle[60];
 		int index;
 	}anim;
 

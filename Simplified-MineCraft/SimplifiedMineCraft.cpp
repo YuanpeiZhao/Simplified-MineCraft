@@ -44,6 +44,11 @@ GLuint water_still_texture_id = -1;
 static const std::string brick_texture_name = "textures/brickBlock/bricks.png";
 GLuint brick_texture_id = -1;
 
+static const std::string ui_texture_name = "textures/ui/widgets.png";
+GLuint ui_texture_id = -1;
+static const std::string select_texture_name = "textures/ui/select.png";
+GLuint select_texture_id = -1;
+
 //Light and Shadow
 vec3 sunlightPos = vec3(0.0f, 0.0f, 0.0f);
 GLuint depthMap;
@@ -78,6 +83,11 @@ static const std::string hand_vs("hand_vs.glsl");
 static const std::string hand_fs("hand_fs.glsl");
 GLuint hand_shader_program = -1;
 GLuint hand_vao = -1;
+
+static const std::string ui_vs("ui_vs.glsl");
+static const std::string ui_fs("ui_fs.glsl");
+GLuint ui_shader_program = -1;
+GLuint ui_vao = -1;
 
 //Shadow files and IDs
 static const std::string shadow_vs("shadow_vs.glsl");
@@ -123,6 +133,38 @@ void draw_gui()
 	ImGui::End();
 
 	ImGui::Render();
+}
+
+void draw_ui() {
+
+	glUseProgram(ui_shader_program);
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, ui_texture_id);
+	glActiveTexture(GL_TEXTURE1);
+	glBindTexture(GL_TEXTURE_2D, select_texture_id);
+
+	glm::mat4 M = glm::translate(glm::vec3(0.2f * cubeType, 0.0f, 0.0f));
+	int M_loc = glGetUniformLocation(ui_shader_program, "M");
+	if (M_loc != -1) {
+		glUniformMatrix4fv(M_loc, 1, false, glm::value_ptr(M));
+	}
+
+	int ui_tex_loc = glGetUniformLocation(ui_shader_program, "ui_tex");
+	if (ui_tex_loc != -1) {
+		glUniform1i(ui_tex_loc, 0);
+	}
+	int select_tex_loc = glGetUniformLocation(ui_shader_program, "select_tex");
+	if (select_tex_loc != -1) {
+		glUniform1i(select_tex_loc, 1);
+	}
+
+	glBindVertexArray(ui_vao);
+
+	glEnable(GL_ALPHA_TEST); // 启用Alpha测试 
+	glAlphaFunc(GL_GREATER, 0.1);// 设置Alpha测试条件为大于0.0则通过即完全透明
+	draw_ui(ui_vao);
+
+	glDisable(GL_ALPHA_TEST);
 }
 
 void draw_skybox(const glm::mat4& P, const glm::mat4& V)
@@ -457,7 +499,8 @@ void display()
 	draw_cubes(P, V);
 	draw_hands(P, V);
 
-	draw_gui();
+	draw_ui();
+	//draw_gui();
 	glutSwapBuffers();
 }
 
@@ -559,6 +602,7 @@ void initOpenGl()
 	plane_shader_program = InitShader(plane_vs.c_str(), plane_fs.c_str());
 	shadow_shader_program = InitShader(shadow_vs.c_str(), shadow_fs.c_str());
 	hand_shader_program = InitShader(hand_vs.c_str(), hand_fs.c_str());
+	ui_shader_program = InitShader(ui_vs.c_str(), ui_fs.c_str());
 
 	init_map();
 	init_shadow_map();
@@ -568,6 +612,7 @@ void initOpenGl()
 	trans_cube_vao = create_trans_cube_vao();
 	plane_vao = create_plane_vao();
 	hand_vao = create_hand_vao();
+	ui_vao = create_ui_vao();
 
 	ImGui_ImplGlut_Init(); // initialize the imgui system
 
@@ -581,7 +626,9 @@ void initOpenGl()
 
 	water_still_texture_id = LoadTexture(water_still_texture_name);
 	brick_texture_id = LoadTexture(brick_texture_name);
-	
+	ui_texture_id = LoadTexture(ui_texture_name);
+	select_texture_id = LoadTexture(select_texture_name);
+
 	SetCursorPos(mouseX, mouseY);
 
 	playBGM();

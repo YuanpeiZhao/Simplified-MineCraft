@@ -10,7 +10,9 @@ GLuint create_cube_vao();
 GLuint create_trans_cube_vao();
 GLuint create_plane_vao();
 GLuint create_hand_vao();
+GLuint create_ui_vao();
 
+void draw_ui(GLuint vao);
 void draw_hand(GLuint vao);
 void draw_cubes(GLuint vao);
 void draw_trans_cubes(GLuint vao);

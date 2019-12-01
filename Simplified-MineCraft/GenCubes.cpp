@@ -354,7 +354,7 @@ GLuint create_hand_vbo() {
 	glGenBuffers(1, &vbo);
 	glBindBuffer(GL_ARRAY_BUFFER, vbo);
 
-	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_DYNAMIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
 
 	return vbo;
 }
@@ -372,6 +372,49 @@ GLuint create_hand_vao()
 
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
 	glEnableVertexAttribArray(0);
+
+	glBindVertexArray(0);
+	return vao;
+}
+GLuint create_ui_vbo() {
+	float vertices[12 * 6] = {	
+		-0.9f, -1.0f, -1.0f, 0.0f, 0.0f, 1.0f,
+		-0.9f, -0.8f, -1.0f, 0.0f, 1.0f, 1.0f,
+		-0.7f, -1.0f, -1.0f, 1.0f, 0.0f, 1.0f,
+		-0.7f, -1.0f, -1.0f, 1.0f, 0.0f, 1.0f,
+		-0.9f, -0.8f, -1.0f, 0.0f, 1.0f, 1.0f,
+		-0.7f, -0.8f, -1.0f, 1.0f, 1.0f, 1.0f,
+
+		-0.9f, -1.0f, -0.9f, 0.0f, 0.0f, 0.0f,
+		-0.9f, -0.8f, -0.9f, 0.0f, 1.0f, 0.0f,
+		0.9f, -1.0f, -0.9f, 1.0f, 0.0f, 0.0f,
+		0.9f, -1.0f, -0.9f, 1.0f, 0.0f, 0.0f,
+		-0.9f, -0.8f, -0.9f, 0.0f, 1.0f, 0.0f,
+		0.9f, -0.8f, -0.9f, 1.0f, 1.0f, 0.0f
+	};
+	GLuint vbo;
+	glGenBuffers(1, &vbo);
+	glBindBuffer(GL_ARRAY_BUFFER, vbo);
+
+	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+	return vbo;
+}
+
+GLuint create_ui_vao()
+{
+	GLuint vao;
+	glGenVertexArrays(1, &vao);
+	glBindVertexArray(vao);
+	GLuint vbo = create_ui_vbo();
+	const GLint pos_loc = 0;
+	glEnableVertexAttribArray(pos_loc);
+
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
+	glEnableVertexAttribArray(1);
+	glVertexAttribPointer(2, 1, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(5 * sizeof(float)));
+	glEnableVertexAttribArray(2);
 
 	glBindVertexArray(0);
 	return vao;
@@ -442,16 +485,28 @@ void redefineCubeVBO()
 
 void DeleteCube(glm::vec3 pos)
 {		
-	soundDig();
-	cubeList.erase(std::remove(cubeList.begin(), cubeList.end(), pos), cubeList.end());
-	redefineCubeVBO();
+	if (pos != null) {
+		soundDig();
+		cubeList.erase(std::remove(cubeList.begin(), cubeList.end(), pos), cubeList.end());
+		redefineCubeVBO();
+	}
+
 }
 
 void AddCube(glm::vec3 pos, int type)
 {
-	soundPut();
-	cubeList.push_back(Cube(type, pos));
-	redefineCubeVBO();
+	
+	if (pos != null) {
+		soundPut();
+		cubeList.push_back(Cube(type, pos));
+		redefineCubeVBO();
+	}
+	
+}
+
+void draw_ui(GLuint vao)
+{
+	glDrawArrays(GL_TRIANGLES, 0 , 12);
 }
 
 void draw_hand(GLuint vao)

@@ -139,5 +139,11 @@
     <None Include="hand_fs.glsl">
       <Filter>资源文件</Filter>
     </None>
+    <None Include="ui_vs.glsl">
+      <Filter>资源文件</Filter>
+    </None>
+    <None Include="ui_fs.glsl">
+      <Filter>资源文件</Filter>
+    </None>
   </ItemGroup>
 </Project>
