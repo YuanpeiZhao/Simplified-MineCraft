@@ -49,6 +49,9 @@ GLuint ui_texture_id = -1;
 static const std::string select_texture_name = "textures/ui/select.png";
 GLuint select_texture_id = -1;
 
+static const std::string arm_texture_name = "textures/player/arm.png";
+GLuint arm_texture_id = -1;
+
 //Light and Shadow
 vec3 sunlightPos = vec3(0.0f, 0.0f, 0.0f);
 GLuint depthMap;
@@ -295,10 +298,23 @@ void draw_skybox(const glm::mat4& P, const glm::mat4& V)
 void draw_hands(const glm::mat4& P, const glm::mat4& V) {
 	
 	player.hand.Update(player.position, player.pitch, player.yaw);
-	glUseProgram(hand_shader_program);
-	int PVM_loc = glGetUniformLocation(hand_shader_program, "PVM");
-	if (PVM_loc != -1) {
-		glUniformMatrix4fv(PVM_loc, 1, false, glm::value_ptr(P*V*player.hand.M));
+	glUseProgram(cube_shader_program);
+	int arm_PVM_loc = glGetUniformLocation(cube_shader_program, "armPVM");
+	if (arm_PVM_loc != -1) {
+		glUniformMatrix4fv(arm_PVM_loc, 1, false, glm::value_ptr(P*V*player.hand.M));
+	}
+
+	int arm_M_loc = glGetUniformLocation(cube_shader_program, "armM");
+	if (arm_M_loc != -1) {
+		glUniformMatrix4fv(arm_M_loc, 1, false, glm::value_ptr(player.hand.M));
+	}
+
+	glActiveTexture(GL_TEXTURE9);
+	glBindTexture(GL_TEXTURE_2D, arm_texture_id);
+	int arm_tex_loc = glGetUniformLocation(cube_shader_program, "arm_tex");
+	if (arm_tex_loc != -1)
+	{
+		glUniform1i(arm_tex_loc, 9);
 	}
 	glBindVertexArray(hand_vao);
 	draw_hand(hand_vao);
@@ -429,6 +445,8 @@ void draw_cubes(const glm::mat4& P, const glm::mat4& V)
 	glBindVertexArray(cube_vao);
 	draw_cubes(cube_vao);
 
+	draw_hands(P, V);
+
 	glEnable(GL_CULL_FACE);
 	glBindVertexArray(trans_cube_vao);
 	draw_trans_cubes(trans_cube_vao);
@@ -497,7 +515,6 @@ void display()
 	draw_skybox(P, V);
 	drawShadowMap();
 	draw_cubes(P, V);
-	draw_hands(P, V);
 
 	draw_ui();
 	//draw_gui();
@@ -628,6 +645,7 @@ void initOpenGl()
 	brick_texture_id = LoadTexture(brick_texture_name);
 	ui_texture_id = LoadTexture(ui_texture_name);
 	select_texture_id = LoadTexture(select_texture_name);
+	arm_texture_id = LoadTexture(arm_texture_name);
 
 	SetCursorPos(mouseX, mouseY);
 

@@ -23,6 +23,8 @@ uniform sampler2D brick_tex;
 
 uniform sampler2D shadowMap;
 
+uniform sampler2D arm_tex;
+
 const float GRASS = 0.0f;
 const float TREE = 1.0f;
 const float LEAF = 2.0f;
@@ -30,6 +32,7 @@ const float WATER = 3.0f;
 const float SAND = 4.0f;
 const float BRICK = 5.0f;
 const float LIGHT = 6.0f;
+const float ARM = 7.0f;
 
 const float threshold = 0.1f;
 
@@ -100,6 +103,11 @@ vec4 renderLight()
 	return vec4(1.0f, 1.0f, 0.7f, 1.0f);
 }
 
+vec4 renderArm()
+{
+	return texture(arm_tex, vec2(TexCoords.x, TexCoords.y * 2.7f));
+}
+
 float ShadowCalculation(vec4 fragPosLightSpace, vec3 normal)
 {
 	vec3 projCoords = fragPosLightSpace.xyz / fragPosLightSpace.w;
@@ -148,8 +156,8 @@ vec3 CalcPointLight(vec3 lightPos)
     float diff = max(dot(Normal, pointLightDir), 0.0);
 
     float dis = length(lightPos - FragPos);
-    float attenuation = 1.0 / (0.0f + 0.0f * dis + 
-                 1.0f * (dis * dis));    
+    float attenuation = 0.7f / (0.0f + 0.1f * dis + 
+                 0.7f * (dis * dis));    
 
     vec3 ambient  = vec3(1.0f, 1.0f, 0.7f)  * 0.4f;
     vec3 diffuse  = vec3(1.0f, 1.0f, 0.7f)  * diff * 0.2f;
@@ -177,6 +185,8 @@ void main()
 		objColor = renderBrick();
 	else if(abs(Type - LIGHT) < 0.5f)
 		objColor = renderLight();
+	else if(abs(Type - ARM) < 0.5f)
+		objColor = renderArm();
 
 	if(abs(Type - LIGHT) < 0.5f)
 	{
@@ -200,6 +210,10 @@ void main()
 		FragColor += vec4(CalcPointLight(vec3(4.0f, 2.0f, 0.0f)), 0.0f);
 		FragColor += vec4(CalcPointLight(vec3(4.0f, 2.0f, 4.0f)), 0.0f);
 		FragColor += vec4(CalcPointLight(vec3(4.0f, 2.0f, -4.0f)), 0.0f);
+		FragColor += vec4(CalcPointLight(vec3(0.0f, 2.0f, 8.0f)), 0.0f);
+		FragColor += vec4(CalcPointLight(vec3(0.0f, 2.0f, -8.0f)), 0.0f);
+		FragColor += vec4(CalcPointLight(vec3(4.0f, 2.0f, 8.0f)), 0.0f);
+		FragColor += vec4(CalcPointLight(vec3(4.0f, 2.0f, -8.0f)), 0.0f);
 	}
 } 
 

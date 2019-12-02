@@ -10,6 +10,7 @@
 #define SAND_CUBE 4
 #define BRICK_CUBE 5
 #define LIGHT_CUBE 6
+#define ARM_CUBE 7
 
 using namespace glm;
 
