@@ -102,7 +102,7 @@ float camangle = 0.0f;
 glm::vec3 campos(3.0f, 3.0f, 3.0f);
 float aspect = 1.0f;
 
-float win_w = 640.0f, win_h = 640.0f;
+float win_w = 1280.0f, win_h = 720.0f;
 float mouseX = win_w / 2, mouseY = win_h / 2;
 float verAxis = 0.0f, horAxis = 0.0f;
 Player player(glm::vec3(0.0f, 15.0f, 0.0f), glm::vec3(0.0f, 0.0f, -1.0f));
@@ -146,10 +146,15 @@ void draw_ui() {
 	glActiveTexture(GL_TEXTURE1);
 	glBindTexture(GL_TEXTURE_2D, select_texture_id);
 
-	glm::mat4 M = glm::translate(glm::vec3(0.2f * cubeType, 0.0f, 0.0f));
-	int M_loc = glGetUniformLocation(ui_shader_program, "M");
-	if (M_loc != -1) {
-		glUniformMatrix4fv(M_loc, 1, false, glm::value_ptr(M));
+	glm::mat4 T = glm::translate(glm::vec3(0.2f * win_h / win_w * cubeType, 0.0f, 0.0f));
+	glm::mat4 S = glm::scale(glm::vec3(win_h / win_w, 1.0f, 1.0f));
+	int S_loc = glGetUniformLocation(ui_shader_program, "S");
+	if (S_loc != -1) {
+		glUniformMatrix4fv(S_loc, 1, false, glm::value_ptr(S));
+	}
+	int T_loc = glGetUniformLocation(ui_shader_program, "T");
+	if (T_loc != -1) {
+		glUniformMatrix4fv(T_loc, 1, false, glm::value_ptr(T));
 	}
 
 	int ui_tex_loc = glGetUniformLocation(ui_shader_program, "ui_tex");
