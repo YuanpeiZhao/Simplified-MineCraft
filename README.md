@@ -9,5 +9,9 @@ CGT 520 Final Project
 * 11.12.2019 Now water is translucent.
 * 11.14.2019 Translucent water bug fixed.
 * 11.17.2019 Add & Delete Cubes
+* 11.21.2019 Add real-time shadow.
+* 11.28.2019 Add music and sound effect.
+* 12.01.2019 Add point lights and bricks.
+* 12.03.2019 Finished!
 ## Use redefineCubeVBO() after destroying or creating a cube!!!
 * All rights reserved.
